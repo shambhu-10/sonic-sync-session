@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Show success message for auth events
           if (event === 'SIGNED_IN') {
             toast.success("Signed in successfully! Welcome back!");
-          } else if (event === 'USER_UPDATED') {
+          } else if (event === 'SIGNED_UP' || event === 'USER_UPDATED') {
             // This event can sometimes be triggered after a successful signup
             if (!session) {
               toast.success("Account created successfully! Welcome to SoundBoard!");

@@ -99,6 +99,24 @@
   html {
     scroll-behavior: smooth;
   }
+  
+  /* Fix recording name visibility in both modes */
+  input, textarea {
+    @apply text-foreground;
+  }
+  
+  .dark input, .dark textarea {
+    @apply text-gray-100;
+  }
+  
+  /* Special styles for specific inputs */
+  .recording-name-input {
+    @apply text-foreground font-medium;
+  }
+  
+  .dark .recording-name-input {
+    @apply text-gray-100;
+  }
 }
 
 /* Animation utilities */
@@ -125,6 +143,20 @@
   
   .text-gradient {
     @apply bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent;
+  }
+  
+  /* Enhanced glass effect */
+  .premium-glass {
+    @apply backdrop-blur-lg bg-white/15 dark:bg-black/20 border border-white/30 dark:border-white/10 shadow-lg;
+  }
+  
+  /* Scroll reveal animations */
+  .reveal-on-scroll {
+    @apply opacity-0 translate-y-8 transition-all duration-700;
+  }
+  
+  .reveal-on-scroll.revealed {
+    @apply opacity-100 translate-y-0;
   }
   
   /* Theme transition utilities */
@@ -173,6 +205,42 @@
   animation: scale-in 0.2s ease-out;
 }
 
+/* Enhanced animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.2) 25%, 
+    rgba(255,255,255,0.2) 75%, 
+    rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
 /* Theme toggle related styles */
 #theme-toggle-wrapper {
   display: flex;
@@ -204,12 +272,84 @@
   transform: translateY(-5px);
 }
 
+/* Enhanced card styles */
+.premium-card {
+  @apply relative overflow-hidden rounded-xl border border-white/20 dark:border-white/10 transition-all duration-500 bg-gradient-to-br from-white/5 to-white/10 dark:from-white/5 dark:to-transparent backdrop-blur-md;
+  box-shadow: 0 10px 40px -15px rgba(0, 0, 0, 0.2);
+}
+
+.premium-card:hover {
+  @apply border-white/30 dark:border-white/20;
+  box-shadow: 0 15px 60px -20px rgba(255, 79, 115, 0.25);
+  transform: translateY(-5px) scale(1.01);
+}
+
 /* Gradient text */
 .gradient-text {
   @apply font-bold bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent;
 }
 
+/* Enhanced gradient text */
+.premium-gradient-text {
+  @apply font-bold bg-gradient-to-br from-soundboard-primary via-soundboard-accent to-soundboard-tertiary bg-clip-text text-transparent;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 /* Decorative elements */
 .decorative-dot {
   @apply absolute rounded-full bg-soundboard-accent/30 animate-pulse;
+}
+
+/* Enhance scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-soundboard-primary/30 rounded-full hover:bg-soundboard-primary/50 transition-colors duration-200;
+}
+
+/* Navbar logo animation */
+.app-logo {
+  @apply transition-all duration-300;
+}
+
+.app-logo:hover {
+  filter: drop-shadow(0 0 8px rgba(255, 79, 115, 0.6));
+  transform: scale(1.05) rotate(5deg);
+}
+
+/* Custom section styles for landing page */
+.hero-section {
+  @apply relative overflow-hidden;
+  background-image: radial-gradient(circle at 50% 50%, 
+    hsla(var(--soundboard-primary), 0.08) 0%, 
+    hsla(var(--soundboard-accent), 0.03) 50%, 
+    transparent 100%);
+}
+
+.features-section {
+  @apply relative overflow-hidden;
+  background-image: 
+    radial-gradient(circle at 10% 10%, hsla(var(--soundboard-tertiary), 0.1) 0%, transparent 70%),
+    radial-gradient(circle at 90% 90%, hsla(var(--soundboard-primary), 0.1) 0%, transparent 70%);
+}
+
+/* Reveal animations for sections */
+.reveal-section {
+  @apply opacity-0 transition-opacity duration-700;
+}
+
+.reveal-section.visible {
+  @apply opacity-100;
+}
+
+/* Fix text contrast for inputs - ensure text is visible in both modes */
+input::placeholder,
+textarea::placeholder {
+  @apply text-gray-500 dark:text-gray-400;
 }
