@@ -68,14 +68,14 @@ const Index = () => {
   return (
     <div className="relative min-h-[calc(100vh-64px)] flex flex-col">
       {/* Enhanced interactive particle background with more dynamic effects */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-background via-background to-soundboard-primary/5">
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-background via-background to-soundboard-primary/5 dark:from-background dark:via-background dark:to-soundboard-primary/10">
         <div className="absolute inset-0 opacity-60">
           <InteractiveParticleBackground />
         </div>
         
         {/* Animated gradient orbs */}
         <div className="absolute top-1/4 left-1/5 w-96 h-96 rounded-full bg-gradient-to-r from-soundboard-accent/10 to-soundboard-primary/10 blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/5 w-64 h-64 rounded-full bg-gradient-to-r from-soundboard-primary/10 to-soundboard-accent/10 blur-[80px] animate-pulse" style={{ animationDelay: "2s" }}></div>
+        <div className="absolute bottom-1/4 right-1/5 w-64 h-64 rounded-full bg-gradient-to-r from-soundboard-primary/10 to-soundboard-tertiary/20 blur-[80px] animate-pulse" style={{ animationDelay: "2s" }}></div>
         
         {/* Subtle pattern overlay */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj4KICA8cGF0aCBkPSJNNTkuNiA1OS42VjU5LjZWNTkuNnoiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPgogIDxwYXRoIGQ9Ik01OS42IDAuNFYwLjRWMC40eiIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjA1Ii8+CiAgPHBhdGggZD0iTTAuNCA1OS42VjU5LjZWNTkuNnoiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPgogIDxwYXRoIGQ9Ik0wLjQgMC40VjAuNFYwLjR6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KICA8cGF0aCBkPSJNMzAgMC40VjU5LjYiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9IjAuMDMiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgPHBhdGggZD0iTTU5LjYgMzBIMC40IiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIiBzdHJva2Utd2lkdGg9IjAuNSIvPgo8L3N2Zz4=')] opacity-10"></div>
@@ -96,11 +96,24 @@ const Index = () => {
             whileHover="hover"
             transition={{ type: "spring", stiffness: 300, damping: 10 }}
           >
-            <MusicIcon className="h-16 w-16 text-soundboard-accent" />
+            <motion.div 
+              className="relative p-4 rounded-full bg-gradient-to-r from-soundboard-primary/10 to-soundboard-accent/10 backdrop-blur-sm"
+              animate={{ 
+                boxShadow: ['0 0 0 0 rgba(255, 79, 115, 0.3)', '0 0 0 15px rgba(255, 79, 115, 0)', '0 0 0 0 rgba(255, 79, 115, 0)'],
+              }}
+              transition={{ 
+                duration: 2,
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatDelay: 1
+              }}
+            >
+              <MusicIcon className="h-16 w-16 text-soundboard-accent animate-pulse-glow" />
+            </motion.div>
           </motion.div>
           
           <motion.h1 
-            className="text-4xl sm:text-6xl font-bold mb-6 bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent"
+            className="text-4xl sm:text-6xl font-bold mb-6 text-gradient drop-shadow-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -126,7 +139,7 @@ const Index = () => {
           >
             {user ? (
               <Button
-                className="bg-soundboard-accent hover:bg-soundboard-secondary text-lg px-8 py-6 hover:scale-105 transition-transform"
+                className="btn-gradient text-lg px-8 py-6 hover:scale-105 transition-transform"
                 asChild
               >
                 <Link to="/dashboard">Go to Dashboard</Link>
@@ -134,7 +147,7 @@ const Index = () => {
             ) : (
               <>
                 <Button
-                  className="bg-soundboard-accent hover:bg-soundboard-secondary text-lg px-8 py-6 hover:scale-105 transition-transform"
+                  className="btn-gradient text-lg px-8 py-6 hover:scale-105 transition-transform"
                   asChild
                 >
                   <Link to="/auth?tab=signup">Get Started</Link>
@@ -153,12 +166,17 @@ const Index = () => {
         </motion.div>
       </div>
       
-      {/* Features Section - ENHANCED with better typography and visual design */}
-      <div className="bg-gradient-to-br from-soundboard-accent/5 to-soundboard-primary/10 py-20 relative overflow-hidden" id="features">
+      {/* Features Section with ENHANCED design */}
+      <div className="bg-gradient-to-br from-soundboard-accent/5 via-soundboard-tertiary/5 to-soundboard-primary/10 py-20 relative overflow-hidden" id="features">
         {/* Add decorative background elements */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-soundboard-accent/10 rounded-full filter blur-[100px]"></div>
-          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-soundboard-primary/10 rounded-full filter blur-[80px]"></div>
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-soundboard-tertiary/10 rounded-full filter blur-[80px]"></div>
+          
+          {/* Decorative dots */}
+          <div className="decorative-dot w-4 h-4 top-1/4 left-1/3"></div>
+          <div className="decorative-dot w-6 h-6 top-2/3 right-1/4"></div>
+          <div className="decorative-dot w-3 h-3 top-1/2 left-3/4"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
@@ -179,7 +197,7 @@ const Index = () => {
               FEATURES
             </motion.span>
             <motion.h2 
-              className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent"
+              className="text-3xl md:text-4xl lg:text-5xl font-bold gradient-text"
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
@@ -205,11 +223,10 @@ const Index = () => {
           >
             {/* Feature 1 */}
             <motion.div 
-              className="bg-background/80 backdrop-blur-sm p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group border border-white/10"
+              className="feature-card p-8 glass-card"
               variants={itemVariants}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-soundboard-primary/5 to-soundboard-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="bg-soundboard-accent/10 p-3 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
+              <div className="bg-gradient-to-br from-soundboard-accent/20 to-soundboard-primary/20 p-3 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
                 <Users className="text-soundboard-accent h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold mb-3">Real-time Collaboration</h3>
@@ -220,11 +237,10 @@ const Index = () => {
             
             {/* Feature 2 */}
             <motion.div 
-              className="bg-background/80 backdrop-blur-sm p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group border border-white/10"
+              className="feature-card p-8 glass-card"
               variants={itemVariants}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-soundboard-primary/5 to-soundboard-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="bg-soundboard-accent/10 p-3 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
+              <div className="bg-gradient-to-br from-soundboard-accent/20 to-soundboard-tertiary/20 p-3 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
                 <Headphones className="text-soundboard-accent h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold mb-3">High-Quality Recording</h3>
@@ -235,11 +251,10 @@ const Index = () => {
             
             {/* Feature 3 */}
             <motion.div 
-              className="bg-background/80 backdrop-blur-sm p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group border border-white/10"
+              className="feature-card p-8 glass-card"
               variants={itemVariants}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-soundboard-primary/5 to-soundboard-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="bg-soundboard-accent/10 p-3 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
+              <div className="bg-gradient-to-br from-soundboard-tertiary/20 to-soundboard-accent/20 p-3 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
                 <Download className="text-soundboard-accent h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold mb-3">Export & Share</h3>
@@ -252,10 +267,10 @@ const Index = () => {
       </div>
       
       {/* How It Works Section */}
-      <div className="py-20" id="how-it-works">
+      <div className="py-20 bg-gradient-to-br from-background to-soundboard-light/5 dark:from-background dark:to-soundboard-dark/20" id="how-it-works">
         <div className="container mx-auto px-4">
           <motion.h2
-            className="text-3xl font-bold mb-16 text-center"
+            className="text-3xl font-bold mb-16 text-center gradient-text"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -265,21 +280,25 @@ const Index = () => {
           </motion.h2>
           
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-10"
+            className="grid grid-cols-1 md:grid-cols-3 gap-10 relative"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
           >
+            {/* Connection lines between steps (visible on md screens and above) */}
+            <div className="hidden md:block absolute top-1/3 left-1/4 w-1/2 h-0.5 bg-gradient-to-r from-soundboard-accent/50 to-soundboard-tertiary/50"></div>
+            
             <motion.div
               className="flex flex-col items-center text-center"
               variants={itemVariants}
             >
               <motion.div 
-                className="bg-soundboard-accent/10 p-6 rounded-full mb-6"
+                className="bg-gradient-to-br from-soundboard-accent/20 to-soundboard-primary/20 p-6 rounded-full mb-6 relative"
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
+                <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-soundboard-accent text-white flex items-center justify-center font-bold text-sm">1</span>
                 <Headphones className="h-10 w-10 text-soundboard-accent" />
               </motion.div>
               <h3 className="text-xl font-semibold mb-3">Create a Jam Room</h3>
@@ -294,11 +313,12 @@ const Index = () => {
               variants={itemVariants}
             >
               <motion.div 
-                className="bg-soundboard-accent/10 p-6 rounded-full mb-6"
+                className="bg-gradient-to-br from-soundboard-tertiary/20 to-soundboard-accent/20 p-6 rounded-full mb-6 relative"
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <Users className="h-10 w-10 text-soundboard-accent" />
+                <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-soundboard-tertiary text-white flex items-center justify-center font-bold text-sm">2</span>
+                <Users className="h-10 w-10 text-soundboard-tertiary" />
               </motion.div>
               <h3 className="text-xl font-semibold mb-3">Collaborate in Real-Time</h3>
               <p className="text-muted-foreground">
@@ -312,11 +332,12 @@ const Index = () => {
               variants={itemVariants}
             >
               <motion.div 
-                className="bg-soundboard-accent/10 p-6 rounded-full mb-6"
+                className="bg-gradient-to-br from-soundboard-primary/20 to-soundboard-tertiary/20 p-6 rounded-full mb-6 relative"
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <Download className="h-10 w-10 text-soundboard-accent" />
+                <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-soundboard-primary text-white flex items-center justify-center font-bold text-sm">3</span>
+                <Download className="h-10 w-10 text-soundboard-primary" />
               </motion.div>
               <h3 className="text-xl font-semibold mb-3">Export & Share</h3>
               <p className="text-muted-foreground">
@@ -329,7 +350,7 @@ const Index = () => {
       </div>
       
       {/* Testimonials Section with ENHANCED Animation and Visual Design */}
-      <div className="bg-gradient-to-tl from-soundboard-primary/10 to-soundboard-accent/5 py-20 relative overflow-hidden">
+      <div className="bg-gradient-to-tl from-soundboard-primary/10 via-soundboard-tertiary/5 to-soundboard-accent/5 py-20 relative overflow-hidden">
         {/* Add decorative elements */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-1/3 right-0 w-80 h-80 bg-soundboard-accent/10 rounded-full filter blur-[80px]"></div>
@@ -357,7 +378,7 @@ const Index = () => {
               TESTIMONIALS
             </motion.span>
             <motion.h2 
-              className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent"
+              className="text-3xl md:text-4xl lg:text-5xl font-bold gradient-text"
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
@@ -403,7 +424,7 @@ const Index = () => {
             ].map((testimonial, index) => (
               <motion.div
                 key={index}
-                className="bg-background/80 backdrop-blur-sm p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border border-white/10 relative overflow-hidden"
+                className="glass-card p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative overflow-hidden"
                 variants={itemVariants}
                 whileHover={{ 
                   y: -5,
@@ -411,7 +432,7 @@ const Index = () => {
                 }}
               >
                 {/* Decorative gradient corner */}
-                <div className="absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br from-soundboard-primary/20 to-soundboard-accent/20 rounded-full blur-xl"></div>
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br from-soundboard-primary/20 to-soundboard-tertiary/20 rounded-full blur-xl"></div>
                 
                 <div className="z-10 relative">
                   <div className="flex items-center mb-6">
@@ -443,7 +464,7 @@ const Index = () => {
       </div>
       
       {/* CTA Section with Enhanced Animation */}
-      <div className="py-20 bg-gradient-to-r from-soundboard-primary/20 to-soundboard-accent/20">
+      <div className="py-20 bg-gradient-to-r from-soundboard-primary/20 via-soundboard-tertiary/10 to-soundboard-accent/20">
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0 }}
@@ -453,7 +474,7 @@ const Index = () => {
             className="max-w-2xl mx-auto"
           >
             <motion.h2 
-              className="text-3xl font-bold mb-6"
+              className="text-3xl font-bold mb-6 gradient-text"
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
@@ -477,7 +498,7 @@ const Index = () => {
               transition={{ delay: 0.4, duration: 0.5 }}
             >
               <Button
-                className="bg-soundboard-accent hover:bg-soundboard-secondary text-white text-lg px-10 py-6 hover:scale-105 transition-transform"
+                className="btn-gradient text-white text-lg px-10 py-6 hover:scale-105 transition-transform rounded-xl"
                 asChild
               >
                 <Link to="/auth?tab=signup">Start Creating Now</Link>

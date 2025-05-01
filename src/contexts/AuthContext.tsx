@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(currentSession);
         
         if (currentSession?.user) {
-          // Show success message for sign in and sign up events
+          // Show success message for auth events
           if (event === 'SIGNED_IN') {
             toast.success("Signed in successfully! Welcome back!");
           } else if (event === 'USER_UPDATED') {

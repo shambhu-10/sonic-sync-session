@@ -8,9 +8,15 @@
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     
+    /* Keep the primary color the same but enhance the accent colors */
     --soundboard-primary: 350 76% 55%;
     --soundboard-secondary: 350 76% 50%;
     --soundboard-accent: 350 76% 60%;
+    
+    /* Add new complementary colors */
+    --soundboard-tertiary: 220 70% 60%;
+    --soundboard-light: 350 76% 97%;
+    --soundboard-dark: 350 60% 30%;
 
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -44,9 +50,15 @@
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 
+    /* Keep the primary color the same but enhance the accent colors */
     --soundboard-primary: 350 76% 55%;
     --soundboard-secondary: 350 76% 45%;
     --soundboard-accent: 350 76% 60%;
+    
+    /* Add new complementary colors */
+    --soundboard-tertiary: 220 70% 50%;
+    --soundboard-light: 350 35% 30%;
+    --soundboard-dark: 350 70% 15%;
  
     --card: 240 10% 6%;
     --card-foreground: 0 0% 98%;
@@ -103,6 +115,18 @@
     @apply animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite];
   }
   
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+  
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-lg;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent;
+  }
+  
   /* Theme transition utilities */
   .theme-transition {
     @apply transition-all duration-300;
@@ -132,6 +156,15 @@
   }
 }
 
+@keyframes pulse-glow {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(255, 79, 115, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(255, 79, 115, 0.8));
+  }
+}
+
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
@@ -144,4 +177,39 @@
 #theme-toggle-wrapper {
   display: flex;
   align-items: center;
+}
+
+/* Button styles */
+.btn-gradient {
+  @apply relative overflow-hidden bg-gradient-to-r from-soundboard-primary to-soundboard-accent hover:from-soundboard-accent hover:to-soundboard-primary transition-all duration-500 text-white shadow-lg;
+}
+
+.btn-gradient::before {
+  content: '';
+  @apply absolute inset-0 bg-white opacity-0 transition-opacity duration-300;
+}
+
+.btn-gradient:hover::before {
+  @apply opacity-10;
+}
+
+/* Card styles */
+.feature-card {
+  @apply relative overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-300;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card:hover {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+/* Gradient text */
+.gradient-text {
+  @apply font-bold bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent;
+}
+
+/* Decorative elements */
+.decorative-dot {
+  @apply absolute rounded-full bg-soundboard-accent/30 animate-pulse;
 }

@@ -46,6 +46,42 @@ const MainNav = () => {
     return location.pathname.startsWith(path);
   };
 
+  // Logo animation variants
+  const logoVariants = {
+    initial: { scale: 1, rotate: 0 },
+    hover: { 
+      scale: 1.1, 
+      rotate: [0, -5, 5, -3, 3, 0],
+      transition: { 
+        duration: 0.7,
+        ease: "easeInOut",
+        times: [0, 0.2, 0.4, 0.6, 0.8, 1],
+      }
+    },
+    tap: { 
+      scale: 0.95,
+      transition: { duration: 0.1 }
+    }
+  };
+
+  // Pulse animation for the icon
+  const pulseVariants = {
+    initial: { 
+      boxShadow: "0 0 0 0 rgba(255, 79, 115, 0)" 
+    },
+    pulse: {
+      boxShadow: [
+        "0 0 0 0 rgba(255, 79, 115, 0.7)",
+        "0 0 0 10px rgba(255, 79, 115, 0)"
+      ],
+      transition: {
+        duration: 1.5,
+        repeat: Infinity,
+        repeatType: "loop" as const
+      }
+    }
+  };
+
   return (
     <nav className="bg-background/95 backdrop-blur-sm sticky top-0 w-full z-50 border-b">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -53,14 +89,20 @@ const MainNav = () => {
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="flex items-center space-x-2 group">
               <motion.div
-                whileHover={{ 
-                  rotate: [0, -10, 10, -5, 5, 0],
-                  scale: 1.1,
-                  transition: { duration: 0.5 }
-                }}
-                className="flex items-center"
+                variants={logoVariants}
+                initial="initial"
+                whileHover="hover"
+                whileTap="tap"
+                className="flex items-center justify-center rounded-full p-1"
               >
-                <MusicIcon className="h-8 w-8 text-soundboard-accent animate-pulse-glow" />
+                <motion.div
+                  variants={pulseVariants}
+                  initial="initial"
+                  animate="pulse"
+                  className="rounded-full"
+                >
+                  <MusicIcon className="h-8 w-8 text-soundboard-accent" />
+                </motion.div>
               </motion.div>
               <motion.span 
                 className="text-xl font-bold bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent"
