@@ -1,9 +1,8 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { 
   LogOut, 
   Settings, 
@@ -14,10 +13,13 @@ import {
   Volume2, 
   VolumeX,
   Download,
-  ExternalLink 
+  ExternalLink,
+  Trash,
+  PlayCircle,
+  AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
-import { getRoom, getLoops, createLoop, createMixdown, joinRoom } from "@/services/api";
+import { getRoom, getLoops, createLoop, createMixdown, joinRoom, deleteRoom, deleteLoop } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Room, Loop, Mixdown } from "@/types";
 import RoomVisibilityToggle from "@/components/room/RoomVisibilityToggle";
@@ -28,6 +30,7 @@ import WaveAnimation from "@/components/WaveAnimation";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const JamRoom = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -42,6 +45,18 @@ const JamRoom = () => {
   const { user } = useAuth();
   const [fetchingLoops, setFetchingLoops] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("recorder");
+  
+  // Delete room dialog state
+  const [deleteRoomDialogOpen, setDeleteRoomDialogOpen] = useState(false);
+  const [isDeletingRoom, setIsDeletingRoom] = useState(false);
+  
+  // Delete loop dialog state
+  const [deleteLoopDialogOpen, setDeleteLoopDialogOpen] = useState(false);
+  const [selectedLoopToDelete, setSelectedLoopToDelete] = useState<Loop | null>(null);
+  const [isDeletingLoop, setIsDeletingLoop] = useState(false);
+  
+  // Single loop playback state
+  const [currentlyPlayingLoopId, setCurrentlyPlayingLoopId] = useState<string | null>(null);
   
   // Export mixdown state
   const [isExporting, setIsExporting] = useState(false);
@@ -306,6 +321,129 @@ const JamRoom = () => {
     }
   };
 
+  // New function for handling room deletion
+  const handleDeleteRoom = async () => {
+    if (!roomId || !user || !room) return;
+    
+    // Only allow the host to delete the room
+    if (room.host_id !== user.id) {
+      toast.error("Only the room host can delete this room.");
+      return;
+    }
+    
+    try {
+      setIsDeletingRoom(true);
+      await deleteRoom(roomId);
+      toast.success("Room deleted successfully");
+      navigate('/dashboard');
+    } catch (error) {
+      console.error("Error deleting room:", error);
+      toast.error("Failed to delete room", {
+        description: error instanceof Error ? error.message : "Please try again later."
+      });
+    } finally {
+      setIsDeletingRoom(false);
+      setDeleteRoomDialogOpen(false);
+    }
+  };
+
+  // New function for handling loop deletion
+  const handleDeleteLoop = async (loopId: string) => {
+    if (!room || !user) return;
+    
+    // Only allow the host to delete loops
+    if (room.host_id !== user.id) {
+      toast.error("Only the room host can delete loops.");
+      return;
+    }
+    
+    // Find the loop to delete
+    const loopToDelete = loops.find(loop => loop.id === loopId);
+    if (!loopToDelete) return;
+    
+    setSelectedLoopToDelete(loopToDelete);
+    setDeleteLoopDialogOpen(true);
+  };
+
+  const confirmDeleteLoop = async () => {
+    if (!selectedLoopToDelete) return;
+    
+    try {
+      setIsDeletingLoop(true);
+      
+      // If the loop is currently playing, stop it
+      if (audioElements.current[selectedLoopToDelete.id]) {
+        audioElements.current[selectedLoopToDelete.id].pause();
+      }
+      
+      // Delete the loop
+      await deleteLoop(selectedLoopToDelete.id);
+      
+      // Remove from local state
+      setLoops(prevLoops => prevLoops.filter(loop => loop.id !== selectedLoopToDelete.id));
+      
+      // Clean up audio element
+      if (audioElements.current[selectedLoopToDelete.id]) {
+        delete audioElements.current[selectedLoopToDelete.id];
+      }
+      
+      toast.success("Loop deleted successfully");
+    } catch (error) {
+      console.error("Error deleting loop:", error);
+      toast.error("Failed to delete loop", {
+        description: error instanceof Error ? error.message : "Please try again later."
+      });
+    } finally {
+      setIsDeletingLoop(false);
+      setDeleteLoopDialogOpen(false);
+      setSelectedLoopToDelete(null);
+    }
+  };
+  
+  // New function for playing a single loop
+  const handlePlaySingleLoop = (loopId: string) => {
+    // Get all audio elements
+    const audioArr = Object.entries(audioElements.current);
+    
+    // Stop all currently playing audio
+    audioArr.forEach(([id, audio]) => {
+      if (id !== loopId) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    });
+    
+    const audio = audioElements.current[loopId];
+    
+    if (audio) {
+      // If already playing this loop, pause it
+      if (currentlyPlayingLoopId === loopId && !audio.paused) {
+        audio.pause();
+        setCurrentlyPlayingLoopId(null);
+      } else {
+        // Otherwise play this loop
+        audio.currentTime = 0;
+        audio.play().catch(err => {
+          console.error("Error playing audio:", err);
+          toast.error("Error playing audio. Try clicking on the page first.");
+        });
+        setCurrentlyPlayingLoopId(loopId);
+        
+        // Set up ended event to reset button state
+        audio.onended = () => {
+          if (currentlyPlayingLoopId === loopId) {
+            setCurrentlyPlayingLoopId(null);
+          }
+        };
+      }
+    }
+    
+    // If we're in global playing mode, turn it off
+    if (isPlaying) {
+      setIsPlaying(false);
+    }
+  };
+
   // FIX 1: Improved mixdown export functionality
   const handleExportMixdown = async () => {
     if (!user || !roomId) {
@@ -555,6 +693,18 @@ const JamRoom = () => {
         </div>
         
         <div className="flex items-center space-x-2">
+          {/* Delete Room Button (for host only) */}
+          {isRoomHost && (
+            <Button 
+              variant="outline" 
+              onClick={() => setDeleteRoomDialogOpen(true)}
+              className="flex items-center border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              Delete Room
+            </Button>
+          )}
+          
           {/* Room settings (for room host only) */}
           {isRoomHost && (
             <Button variant="outline" onClick={() => setSettingsOpen(true)}>
@@ -704,17 +854,42 @@ const JamRoom = () => {
                             <p className="text-sm text-muted-foreground">By {loop.username}</p>
                           </div>
                           
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleToggleLoop(loop.id)}
-                          >
-                            {loop.is_active ? (
-                              <Volume2 className="h-4 w-4" />
-                            ) : (
-                              <VolumeX className="h-4 w-4" />
+                          <div className="flex items-center space-x-2">
+                            {/* Play Single Loop Button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handlePlaySingleLoop(loop.id)}
+                              className={currentlyPlayingLoopId === loop.id ? "text-green-500" : ""}
+                            >
+                              <PlayCircle className="h-4 w-4" />
+                            </Button>
+                            
+                            {/* Toggle Loop Button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleToggleLoop(loop.id)}
+                            >
+                              {loop.is_active ? (
+                                <Volume2 className="h-4 w-4" />
+                              ) : (
+                                <VolumeX className="h-4 w-4" />
+                              )}
+                            </Button>
+                            
+                            {/* Delete Loop Button (visible only to host) */}
+                            {isRoomHost && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteLoop(loop.id)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash className="h-4 w-4" />
+                              </Button>
                             )}
-                          </Button>
+                          </div>
                         </div>
                         
                         <div className="pl-2 pr-4">
@@ -818,6 +993,73 @@ const JamRoom = () => {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Delete Room Confirmation Dialog */}
+      <AlertDialog 
+        open={deleteRoomDialogOpen} 
+        onOpenChange={setDeleteRoomDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center text-red-500">
+              <AlertCircle className="mr-2 h-5 w-5" /> Delete Room
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this room? This action cannot be undone.
+              All loops, recordings, and mixdowns associated with this room will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingRoom}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteRoom();
+              }}
+              className="bg-red-500 hover:bg-red-600"
+              disabled={isDeletingRoom}
+            >
+              {isDeletingRoom ? "Deleting..." : "Delete Room"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
+      {/* Delete Loop Confirmation Dialog */}
+      <AlertDialog 
+        open={deleteLoopDialogOpen} 
+        onOpenChange={setDeleteLoopDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center text-red-500">
+              <AlertCircle className="mr-2 h-5 w-5" /> Delete Loop
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this loop? This action cannot be undone.
+              {selectedLoopToDelete && (
+                <div className="mt-2 p-2 bg-muted rounded-md">
+                  <p className="font-medium">{selectedLoopToDelete.name}</p>
+                  <p className="text-sm">By {selectedLoopToDelete.username}</p>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingLoop}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                confirmDeleteLoop();
+              }}
+              className="bg-red-500 hover:bg-red-600"
+              disabled={isDeletingLoop}
+            >
+              {isDeletingLoop ? "Deleting..." : "Delete Loop"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

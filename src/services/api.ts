@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Room, Loop, Participant, Mixdown, User, ChatMessage } from "@/types";
 
@@ -98,6 +97,40 @@ export const createRoom = async (roomData: Partial<Room>) => {
   }
   
   return data as Room;
+};
+
+// Add new function to delete a room
+export const deleteRoom = async (roomId: string) => {
+  // First delete all associated loops
+  try {
+    // Get all loops for this room
+    const { data: loops } = await supabase
+      .from("loops")
+      .select("id")
+      .eq("room_id", roomId);
+      
+    if (loops && loops.length > 0) {
+      // Delete each loop
+      for (const loop of loops) {
+        await deleteLoop(loop.id);
+      }
+    }
+    
+    // Then delete the room
+    const { error } = await supabase
+      .from("rooms")
+      .delete()
+      .eq("id", roomId);
+    
+    if (error) {
+      throw error;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error deleting room:", error);
+    throw error;
+  }
 };
 
 // Loop Services
@@ -203,16 +236,51 @@ export const updateLoop = async (loopId: string, updates: Partial<Loop>) => {
 };
 
 export const deleteLoop = async (loopId: string) => {
-  const { error } = await supabase
-    .from("loops")
-    .delete()
-    .eq("id", loopId);
-  
-  if (error) {
+  try {
+    // First get the loop to access its file_url
+    const { data: loop, error: fetchError } = await supabase
+      .from("loops")
+      .select("file_url")
+      .eq("id", loopId)
+      .single();
+    
+    if (fetchError) {
+      throw fetchError;
+    }
+    
+    // Delete the audio file from storage if it exists
+    if (loop && loop.file_url) {
+      try {
+        // Extract file path from the URL
+        const url = new URL(loop.file_url);
+        const filePath = url.pathname.split('/audio/')[1];
+        
+        if (filePath) {
+          await supabase.storage
+            .from("audio")
+            .remove([filePath]);
+        }
+      } catch (storageError) {
+        console.error("Error deleting audio file from storage:", storageError);
+        // Continue with deletion even if file removal fails
+      }
+    }
+    
+    // Delete the loop record from the database
+    const { error } = await supabase
+      .from("loops")
+      .delete()
+      .eq("id", loopId);
+    
+    if (error) {
+      throw error;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error deleting loop:", error);
     throw error;
   }
-  
-  return true;
 };
 
 // Participant Services
