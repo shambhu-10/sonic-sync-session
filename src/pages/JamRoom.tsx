@@ -758,7 +758,11 @@ const JamRoom = () => {
                     onChange={(e) => setRecordingName(e.target.value)}
                     disabled={isRecording}
                     placeholder="Enter a name for your recording"
+<<<<<<< HEAD
                     className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary recording-name-input"
+=======
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground placeholder:text-muted-foreground"
+>>>>>>> 18483a1 (change the record loop input text color)
                   />
                 </div>
                 
