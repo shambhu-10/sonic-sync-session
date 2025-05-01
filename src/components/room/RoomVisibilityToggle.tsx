@@ -3,8 +3,9 @@ import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { GlobeIcon, LockIcon } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Spinner } from "../ui/spinner";
 
 interface RoomVisibilityToggleProps {
   roomId: string;
@@ -19,7 +20,6 @@ export default function RoomVisibilityToggle({
 }: RoomVisibilityToggleProps) {
   const [isPublic, setIsPublic] = useState(initialVisibility);
   const [isUpdating, setIsUpdating] = useState(false);
-  const { toast } = useToast();
   
   const handleToggleVisibility = async () => {
     if (!isHost) return;
@@ -37,15 +37,10 @@ export default function RoomVisibilityToggle({
       if (error) throw error;
       
       setIsPublic(newVisibility);
-      toast({
-        title: "Room visibility updated",
-        description: `Room is now ${newVisibility ? 'public' : 'private'}`,
-      });
+      toast.success(`Room is now ${newVisibility ? 'public' : 'private'}`);
     } catch (error) {
       console.error('Failed to update room visibility:', error);
-      toast({
-        variant: "destructive",
-        title: "Failed to update room visibility",
+      toast.error("Failed to update room visibility", {
         description: "Please try again later.",
       });
     } finally {
@@ -62,7 +57,12 @@ export default function RoomVisibilityToggle({
         disabled={!isHost || isUpdating}
       />
       <Label htmlFor="room-visibility" className="cursor-pointer flex items-center">
-        {isPublic ? (
+        {isUpdating ? (
+          <>
+            <Spinner size="sm" className="mr-2" />
+            <span>Updating...</span>
+          </>
+        ) : isPublic ? (
           <>
             <GlobeIcon className="h-4 w-4 mr-1" />
             <span>Public</span>

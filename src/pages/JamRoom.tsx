@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LogOut, Settings, Mic, MicOff, Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
-import { getRoom } from "@/services/api";
+import { getRoom, getLoops, createLoop } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Room, Loop } from "@/types";
 import RoomVisibilityToggle from "@/components/room/RoomVisibilityToggle";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import WaveAnimation from "@/components/WaveAnimation";
 
 const JamRoom = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -25,6 +26,7 @@ const JamRoom = () => {
   const [recordingName, setRecordingName] = useState("");
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [fetchingLoops, setFetchingLoops] = useState(false);
   
   // Audio recording state
   const { 
@@ -45,6 +47,7 @@ const JamRoom = () => {
         setLoading(true);
         const roomData = await getRoom(roomId);
         setRoom(roomData);
+        fetchLoopsForRoom(roomId);
       } catch (error) {
         console.error("Error fetching room:", error);
         setError("Failed to load jam room");
@@ -69,67 +72,30 @@ const JamRoom = () => {
   }, [roomId]);
 
   // Fetch all loops for this room
-  useEffect(() => {
-    const fetchLoops = async () => {
-      if (!roomId) return;
+  const fetchLoopsForRoom = async (roomId: string) => {
+    if (!roomId) return;
+    
+    try {
+      setFetchingLoops(true);
+      const fetchedLoops = await getLoops(roomId);
+      setLoops(fetchedLoops);
       
-      try {
-        // This would typically be a call to your API
-        // In a real implementation, replace with actual API call
-        const mockLoops: Loop[] = [
-          {
-            id: "1",
-            room_id: roomId,
-            user_id: "user1",
-            name: "Bass line",
-            file_url: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3",
-            order_index: 0,
-            is_active: true,
-            volume: 75,
-            created_at: new Date().toISOString(),
-            username: "John"
-          },
-          {
-            id: "2",
-            room_id: roomId,
-            user_id: "user2",
-            name: "Guitar riff",
-            file_url: "https://assets.mixkit.co/music/preview/mixkit-hazy-after-hours-132.mp3",
-            order_index: 1,
-            is_active: true,
-            volume: 65,
-            created_at: new Date().toISOString(),
-            username: "Sarah"
-          }
-        ];
-        
-        setLoops(mockLoops);
-        
-        // Initialize audio elements for each loop
-        mockLoops.forEach(loop => {
-          if (!audioElements.current[loop.id]) {
-            const audio = new Audio(loop.file_url);
-            audio.loop = true;
-            audio.volume = loop.volume / 100;
-            audioElements.current[loop.id] = audio;
-          }
-        });
-      } catch (error) {
-        console.error("Error fetching loops:", error);
-        toast.error("Failed to load audio loops");
-      }
-    };
-    
-    fetchLoops();
-    
-    return () => {
-      // Cleanup audio elements when unmounting
-      Object.values(audioElements.current).forEach(audio => {
-        audio.pause();
-        audio.currentTime = 0;
+      // Initialize audio elements for each loop
+      fetchedLoops.forEach(loop => {
+        if (!audioElements.current[loop.id]) {
+          const audio = new Audio(loop.file_url);
+          audio.loop = true;
+          audio.volume = loop.volume / 100;
+          audioElements.current[loop.id] = audio;
+        }
       });
-    };
-  }, [roomId]);
+    } catch (error) {
+      console.error("Error fetching loops:", error);
+      toast.error("Failed to load audio loops");
+    } finally {
+      setFetchingLoops(false);
+    }
+  };
 
   const handleExitRoom = () => {
     // Stop all audio before exiting
@@ -221,36 +187,46 @@ const JamRoom = () => {
       return;
     }
     
-    // In a real implementation, you would upload the blob to your storage
-    // and add the loop to the database
+    if (!user || !roomId) {
+      toast.error("Cannot save recording - user or room information missing");
+      return;
+    }
     
-    const newLoop: Loop = {
-      id: `new-${Date.now()}`,
-      room_id: roomId || "",
-      user_id: user?.id || "",
-      name: recordingName,
-      file_url: URL.createObjectURL(audioBlob), // This is temporary, would be an actual URL in production
-      order_index: loops.length,
-      is_active: true,
-      volume: 75,
-      created_at: new Date().toISOString(),
-      username: user?.username || "You"
-    };
-    
-    // Add new loop to the list
-    setLoops([...loops, newLoop]);
-    
-    // Create audio element for new loop
-    const audio = new Audio(newLoop.file_url);
-    audio.loop = true;
-    audio.volume = newLoop.volume / 100;
-    audioElements.current[newLoop.id] = audio;
-    
-    // Reset recording state
-    resetRecording();
-    setRecordingName("");
-    
-    toast.success("Recording saved");
+    try {
+      toast.loading("Saving your recording...");
+      
+      // Upload blob to storage and create loop record
+      const newLoop = await createLoop(
+        {
+          room_id: roomId,
+          user_id: user.id,
+          name: recordingName,
+          is_active: true,
+          volume: 75,
+          order_index: loops.length
+        },
+        audioBlob
+      );
+      
+      // Add the new audio element
+      const audio = new Audio(newLoop.file_url);
+      audio.loop = true;
+      audio.volume = newLoop.volume / 100;
+      audioElements.current[newLoop.id] = audio;
+      
+      // Update loops list
+      setLoops([...loops, newLoop]);
+      
+      // Reset recording state
+      resetRecording();
+      setRecordingName("");
+      
+      toast.dismiss();
+      toast.success("Recording saved successfully");
+    } catch (error) {
+      console.error("Error saving recording:", error);
+      toast.error("Failed to save recording");
+    }
   };
 
   const isRoomHost = room && user && room.host_id === user.id;
@@ -258,6 +234,7 @@ const JamRoom = () => {
   if (loading) {
     return (
       <div className="h-[80vh] flex flex-col items-center justify-center">
+        <WaveAnimation />
         <Spinner size="lg" />
         <p className="mt-4 text-muted-foreground">Loading jam room...</p>
       </div>
@@ -395,7 +372,12 @@ const JamRoom = () => {
             </Button>
           </div>
           
-          {loops.length === 0 ? (
+          {fetchingLoops ? (
+            <div className="flex justify-center items-center h-32">
+              <Spinner size="md" />
+              <p className="ml-3">Loading loops...</p>
+            </div>
+          ) : loops.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <p>No loops have been recorded yet.</p>
               <p>Be the first to add a loop!</p>

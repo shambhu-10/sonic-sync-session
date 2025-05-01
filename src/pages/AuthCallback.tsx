@@ -13,12 +13,17 @@ const AuthCallback = () => {
     const handleAuthCallback = async () => {
       try {
         // Check if we have a hash in the URL (OAuth sign-in)
-        if (window.location.hash) {
-          setMessage('Completing OAuth authentication...');
+        const hash = window.location.hash;
+        const query = window.location.search;
+        
+        if (hash || query) {
+          setMessage('Completing authentication...');
           
           // Process the OAuth callback
-          // Use exchangeCodeForSession for newer Supabase versions
-          const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.hash);
+          // For newer Supabase versions
+          const { data, error } = hash 
+            ? await supabase.auth.exchangeCodeForSession(hash)
+            : await supabase.auth.getSession();
           
           if (error) {
             throw error;
@@ -26,7 +31,15 @@ const AuthCallback = () => {
           
           // Successfully retrieved session from URL
           toast.success('Authentication successful');
-          navigate('/dashboard', { replace: true });
+          
+          // Check for redirect information
+          const fromPath = sessionStorage.getItem('authRedirectPath');
+          if (fromPath) {
+            sessionStorage.removeItem('authRedirectPath');
+            navigate(fromPath, { replace: true });
+          } else {
+            navigate('/dashboard', { replace: true });
+          }
           return;
         }
         
