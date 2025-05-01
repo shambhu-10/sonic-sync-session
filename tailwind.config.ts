@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+                // Custom music-themed colors
+                soundboard: {
+                    primary: '#9b87f5',
+                    secondary: '#7E69AB',
+                    tertiary: '#6E59A5',
+                    dark: '#1A1F2C',
+                    light: '#D6BCFA',
+                    accent: '#8B5CF6',
+                }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +94,46 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+                'fade-in': {
+                    '0%': { 
+                        opacity: '0',
+                        transform: 'translateY(10px)'
+                    },
+                    '100%': { 
+                        opacity: '1',
+                        transform: 'translateY(0)'
+                    }
+                },
+                'pulse-recording': {
+                    '0%, 100%': { 
+                        transform: 'scale(1)',
+                        opacity: '1'
+                    },
+                    '50%': { 
+                        transform: 'scale(1.05)',
+                        opacity: '0.8'
+                    }
+                },
+                'wave': {
+                    '0%': { transform: 'translateX(0) translateY(0)' },
+                    '25%': { transform: 'translateX(2px) translateY(2px)' },
+                    '50%': { transform: 'translateX(0) translateY(5px)' },
+                    '75%': { transform: 'translateX(-2px) translateY(2px)' },
+                    '100%': { transform: 'translateX(0) translateY(0)' }
+                }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+                'fade-in': 'fade-in 0.5s ease-out forwards',
+                'pulse-recording': 'pulse-recording 1.5s infinite',
+                'wave': 'wave 3s ease-in-out infinite'
+			},
+            backgroundImage: {
+                'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                'hero-pattern': 'linear-gradient(120deg, #9b87f5 0%, #7E69AB 100%)',
+            },
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
