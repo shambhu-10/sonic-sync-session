@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,14 +8,14 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { 
-  RecordIcon, 
+  Mic, 
   StopCircleIcon, 
   Play, 
   DownloadIcon,
   LinkIcon,
   UsersIcon,
   MessagesSquareIcon,
-  Mic
+  Mic as RecordIcon
 } from "lucide-react";
 import WaveAnimation from "@/components/WaveAnimation";
 import { toast } from "sonner";

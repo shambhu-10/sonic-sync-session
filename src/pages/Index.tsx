@@ -6,7 +6,7 @@ import {
   Music2Icon, 
   HeadphonesIcon, 
   UsersIcon, 
-  WaveformIcon, 
+  AudioWaveformIcon, 
   DownloadIcon, 
   AudioLinesIcon 
 } from "lucide-react";
@@ -124,7 +124,7 @@ const Index = () => {
           <div className="mt-16 w-full max-w-4xl relative animate-item">
             <div className="aspect-video rounded-xl overflow-hidden shadow-xl border border-white/20 bg-soundboard-dark/70 backdrop-blur-sm">
               <div className="flex items-center justify-center h-full">
-                <WaveformIcon size={120} className="text-white/20" />
+                <AudioWaveformIcon size={120} className="text-white/20" />
               </div>
             </div>
           </div>
@@ -200,7 +200,7 @@ const Index = () => {
             
             <div className="bg-card rounded-lg p-6 shadow-sm border animate-item">
               <div className="bg-soundboard-primary/10 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                <WaveformIcon className="text-soundboard-primary" />
+                <AudioWaveformIcon className="text-soundboard-primary" />
               </div>
               <h3 className="text-xl font-medium mb-2">Audio Visualizations</h3>
               <p className="text-muted-foreground">
