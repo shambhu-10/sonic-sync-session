@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useProfileStats } from "@/hooks/useProfileStats";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -42,6 +44,7 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [mixdowns, setMixdowns] = useState<(Mixdown & { roomTitle?: string, username?: string })[]>([]);
   const [isLoadingMixdowns, setIsLoadingMixdowns] = useState(false);
+  const { stats, isLoading: isLoadingStats } = useProfileStats(user);
   
   useEffect(() => {
     if (user) {
@@ -152,11 +155,12 @@ const Profile = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
+            className="hover:transform hover:scale-[1.02] transition-all duration-300"
           >
-            <Card>
+            <Card className="overflow-hidden border-t-4 border-soundboard-accent">
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center">
-                  <Avatar className="h-24 w-24 mb-4">
+                  <Avatar className="h-24 w-24 mb-4 ring-4 ring-soundboard-accent/20 animate-pulse-glow">
                     <AvatarImage src={user.avatar_url} alt={user.username} />
                     <AvatarFallback className="bg-soundboard-accent text-white text-xl">
                       {user.username ? user.username[0].toUpperCase() : "U"}
@@ -172,6 +176,7 @@ const Profile = () => {
                           value={username}
                           onChange={(e) => setUsername(e.target.value)}
                           required
+                          className="transition-all focus:ring-2 focus:ring-soundboard-accent"
                         />
                       </div>
                       <div className="flex justify-end space-x-2">
@@ -180,6 +185,7 @@ const Profile = () => {
                           variant="outline"
                           onClick={() => setIsEditing(false)}
                           disabled={isLoading}
+                          className="hover:bg-muted/50 transition-colors"
                         >
                           Cancel
                         </Button>
@@ -194,7 +200,13 @@ const Profile = () => {
                     </form>
                   ) : (
                     <>
-                      <h2 className="text-2xl font-bold">{user.username || "Anonymous"}</h2>
+                      <motion.h2 
+                        className="text-2xl font-bold"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        {user.username || "Anonymous"}
+                      </motion.h2>
                       <p className="text-muted-foreground mb-4">{user.email}</p>
                       <p className="text-sm text-muted-foreground">
                         Member since {new Date().toLocaleDateString()} {/* This would typically come from user.created_at */}
@@ -202,10 +214,10 @@ const Profile = () => {
                       <Button
                         onClick={() => setIsEditing(true)}
                         variant="outline"
-                        className="mt-4"
+                        className="mt-4 hover:shadow-md transition-shadow group"
                       >
-                        <User className="mr-2 h-4 w-4" />
-                        Edit Profile
+                        <User className="mr-2 h-4 w-4 group-hover:text-soundboard-accent transition-colors" />
+                        <span className="group-hover:text-soundboard-accent transition-colors">Edit Profile</span>
                       </Button>
                     </>
                   )}
@@ -218,47 +230,71 @@ const Profile = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
+            className="hover:transform hover:scale-[1.02] transition-all duration-300"
           >
-            <Card>
+            <Card className="overflow-hidden border-t-4 border-soundboard-accent">
               <CardHeader>
-                <CardTitle>Activity Stats</CardTitle>
+                <CardTitle className="flex items-center">
+                  <BarChart3Icon className="mr-2 h-5 w-5 text-soundboard-accent" />
+                  <span>Activity Stats</span>
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <MusicIcon className="h-4 w-4 text-soundboard-primary mr-2" />
-                    <span className="text-sm">Rooms Hosted</span>
+                {isLoadingStats ? (
+                  <div className="flex justify-center py-8">
+                    <Spinner size="md" className="text-soundboard-accent" />
                   </div>
-                  <span className="font-bold">{user.rooms_hosted}</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <Disc3Icon className="h-4 w-4 text-soundboard-primary mr-2" />
-                    <span className="text-sm">Loops Recorded</span>
-                  </div>
-                  <span className="font-bold">{user.loops_recorded}</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <DownloadIcon className="h-4 w-4 text-soundboard-primary mr-2" />
-                    <span className="text-sm">Mixdowns Exported</span>
-                  </div>
-                  <span className="font-bold">{user.mixdowns_exported}</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <BarChart3Icon className="h-4 w-4 text-soundboard-primary mr-2" />
-                    <span className="text-sm">Avg Loops/Session</span>
-                  </div>
-                  <span className="font-bold">
-                    {user.rooms_hosted > 0 
-                      ? (user.loops_recorded / user.rooms_hosted).toFixed(1) 
-                      : '0.0'}
-                  </span>
-                </div>
+                ) : (
+                  <>
+                    <motion.div 
+                      className="flex justify-between items-center p-3 hover:bg-muted/50 rounded-md transition-colors"
+                      whileHover={{ x: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <div className="flex items-center">
+                        <MusicIcon className="h-4 w-4 text-soundboard-accent mr-2" />
+                        <span className="text-sm">Rooms Hosted</span>
+                      </div>
+                      <span className="font-bold text-lg">{stats.roomsHosted}</span>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="flex justify-between items-center p-3 hover:bg-muted/50 rounded-md transition-colors"
+                      whileHover={{ x: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <div className="flex items-center">
+                        <Disc3Icon className="h-4 w-4 text-soundboard-accent mr-2" />
+                        <span className="text-sm">Loops Recorded</span>
+                      </div>
+                      <span className="font-bold text-lg">{stats.loopsRecorded}</span>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="flex justify-between items-center p-3 hover:bg-muted/50 rounded-md transition-colors"
+                      whileHover={{ x: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <div className="flex items-center">
+                        <DownloadIcon className="h-4 w-4 text-soundboard-accent mr-2" />
+                        <span className="text-sm">Mixdowns Exported</span>
+                      </div>
+                      <span className="font-bold text-lg">{stats.mixdownsExported}</span>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="flex justify-between items-center p-3 hover:bg-muted/50 rounded-md transition-colors"
+                      whileHover={{ x: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <div className="flex items-center">
+                        <BarChart3Icon className="h-4 w-4 text-soundboard-accent mr-2" />
+                        <span className="text-sm">Avg Loops/Session</span>
+                      </div>
+                      <span className="font-bold text-lg">{stats.avgLoopsPerSession}</span>
+                    </motion.div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -271,23 +307,32 @@ const Profile = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
         >
-          <Card>
+          <Card className="overflow-hidden border-t-4 border-soundboard-accent">
             <CardHeader>
-              <CardTitle>Mixdown History</CardTitle>
+              <CardTitle className="flex items-center">
+                <FileAudio className="mr-2 h-5 w-5 text-soundboard-accent" />
+                <span>Mixdown History</span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {isLoadingMixdowns ? (
                 <div className="flex justify-center py-8">
-                  <Spinner size="lg" />
+                  <Spinner size="lg" className="text-soundboard-accent" />
                 </div>
               ) : mixdowns.length === 0 ? (
                 <div className="text-center py-8">
-                  <FileAudio className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <FileAudio className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  </motion.div>
                   <h3 className="text-lg font-medium mb-2">No mixdowns yet</h3>
                   <p className="text-muted-foreground mb-4">
                     Create jam sessions and export mixdowns to see your history here.
                   </p>
-                  <Button asChild className="bg-soundboard-accent hover:bg-soundboard-secondary transition-all">
+                  <Button asChild className="bg-soundboard-accent hover:bg-soundboard-secondary transition-all hover:scale-105 transform">
                     <Link to="/dashboard">Create a Jam Room</Link>
                   </Button>
                 </div>
@@ -301,8 +346,14 @@ const Profile = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mixdowns.map((mixdown) => (
-                      <TableRow key={mixdown.id}>
+                    {mixdowns.map((mixdown, index) => (
+                      <motion.tr
+                        key={mixdown.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                        className="hover:bg-muted/50 transition-colors"
+                      >
                         <TableCell className="font-medium">{mixdown.roomTitle || "Untitled Session"}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
@@ -315,13 +366,13 @@ const Profile = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => downloadMixdown(mixdown.file_url, mixdown.roomTitle || "Mixdown")}
-                            className="h-8"
+                            className="h-8 hover:bg-soundboard-accent/10 hover:text-soundboard-accent transition-colors group"
                           >
-                            <DownloadIcon className="h-4 w-4 mr-1" />
-                            Download
+                            <DownloadIcon className="h-4 w-4 mr-1 group-hover:scale-110 transition-transform" />
+                            <span>Download</span>
                           </Button>
                         </TableCell>
-                      </TableRow>
+                      </motion.tr>
                     ))}
                   </TableBody>
                 </Table>

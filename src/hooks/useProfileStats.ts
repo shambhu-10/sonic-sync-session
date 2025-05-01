@@ -61,6 +61,39 @@ export function useProfileStats(user: User | null) {
     };
     
     calculateUserStats();
+    
+    // Set up a real-time subscription to profile changes
+    const channel = supabase
+      .channel('profile_changes')
+      .on('postgres_changes', 
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'profiles',
+          filter: `id=eq.${user.id}`
+        },
+        (payload) => {
+          const updatedProfile = payload.new as any;
+          
+          // Calculate average loops per session
+          const avgLoops = updatedProfile.rooms_hosted > 0 
+            ? (updatedProfile.loops_recorded / updatedProfile.rooms_hosted).toFixed(1) 
+            : "0.0";
+            
+          setStats({
+            roomsHosted: updatedProfile.rooms_hosted || 0,
+            loopsRecorded: updatedProfile.loops_recorded || 0,
+            mixdownsExported: updatedProfile.mixdowns_exported || 0,
+            avgLoopsPerSession: avgLoops
+          });
+        }
+      )
+      .subscribe();
+      
+    // Clean up subscription
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
   
   return { stats, isLoading };

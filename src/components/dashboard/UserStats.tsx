@@ -4,6 +4,7 @@ import StatCard from "./StatCard";
 import { MusicIcon, Disc3Icon, ArrowDownIcon, BarChart3Icon } from "lucide-react";
 import { useProfileStats } from "@/hooks/useProfileStats";
 import { Spinner } from "@/components/ui/spinner";
+import { motion } from "framer-motion";
 
 interface UserStatsProps {
   user: User | null;
@@ -14,15 +15,25 @@ const UserStats = ({ user }: UserStatsProps) => {
   
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-32 mb-8">
-        <Spinner size="md" />
+      <motion.div 
+        className="flex justify-center items-center h-32 mb-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Spinner size="md" className="text-soundboard-accent" />
         <span className="ml-2 text-muted-foreground">Loading your stats...</span>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <motion.div 
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <StatCard 
         icon={MusicIcon} 
         title="Rooms Hosted" 
@@ -47,7 +58,7 @@ const UserStats = ({ user }: UserStatsProps) => {
         value={stats.avgLoopsPerSession} 
         delay={0.4} 
       />
-    </div>
+    </motion.div>
   );
 };
 

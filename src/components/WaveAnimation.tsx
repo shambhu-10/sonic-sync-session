@@ -45,6 +45,20 @@ const WaveAnimation = () => {
         amplitude: 40,
         frequency: 0.01,
         color: "rgba(233, 69, 96, 0.09)"
+      },
+      {
+        y: canvas.height * 0.6,
+        length: 0.015,
+        amplitude: 35,
+        frequency: 0.012,
+        color: "rgba(233, 69, 96, 0.06)"
+      },
+      {
+        y: canvas.height * 0.4,
+        length: 0.025,
+        amplitude: 30,
+        frequency: 0.008,
+        color: "rgba(233, 69, 96, 0.04)"
       }
     ];
 
@@ -61,8 +75,11 @@ const WaveAnimation = () => {
         
         // Draw wave path
         for (let x = 0; x < canvas.width; x++) {
-          // Wave calculation
-          const y = wave.y + Math.sin(x * wave.length + increment) * wave.amplitude * Math.sin(increment * wave.frequency);
+          // Wave calculation with more variations
+          const y = wave.y + 
+                   Math.sin(x * wave.length + increment) * 
+                   wave.amplitude * 
+                   Math.sin(increment * wave.frequency);
           ctx.lineTo(x, y);
         }
         
