@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
@@ -18,7 +19,7 @@ import {
 import { toast } from "sonner";
 import { getRoom, getLoops, createLoop, createMixdown } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
-import { Room, Loop } from "@/types";
+import { Room, Loop, Mixdown } from "@/types";
 import RoomVisibilityToggle from "@/components/room/RoomVisibilityToggle";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { Slider } from "@/components/ui/slider";
@@ -282,7 +283,7 @@ const JamRoom = () => {
       const mockMixdownBlob = new Blob([new Uint8Array(10000)], { type: 'audio/webm' });
       
       // Save the mixdown using the API
-      const mixdownData: Partial<Mixdown> = {
+      const mixdownData = {
         room_id: roomId,
         user_id: user.id,
       };
