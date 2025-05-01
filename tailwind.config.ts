@@ -75,10 +75,30 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
+        "wave": {
+          "0%": { transform: "rotate(0deg)" },
+          "10%": { transform: "rotate(14deg)" },
+          "20%": { transform: "rotate(-8deg)" },
+          "30%": { transform: "rotate(14deg)" },
+          "40%": { transform: "rotate(-4deg)" },
+          "50%": { transform: "rotate(10deg)" },
+          "60%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(0deg)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { 
+            filter: "drop-shadow(0 0 0.5rem hsla(var(--soundboard-accent), 0.5))" 
+          },
+          "50%": { 
+            filter: "drop-shadow(0 0 1rem hsla(var(--soundboard-accent), 0.75))" 
+          },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "wave": "wave 2s linear infinite",
+        "pulse-glow": "pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },

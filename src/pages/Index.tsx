@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import BackgroundMusic from "@/components/BackgroundMusic";
 
 // Featured rooms data
 const featuredRooms = [
@@ -112,6 +112,9 @@ const Index = () => {
 
   return (
     <div className="bg-background text-foreground">
+      {/* Background Music Component */}
+      <BackgroundMusic />
+      
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-soundboard-primary/10 to-background pt-20 pb-40">
         <div className="absolute inset-0 z-0 opacity-20">
