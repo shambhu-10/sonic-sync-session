@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { motion } from "framer-motion";
 
 const MainNav = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,32 +44,48 @@ const MainNav = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="flex items-center space-x-2 group">
-              <MusicIcon className="h-8 w-8 text-soundboard-accent animate-wave group-hover:animate-pulse transition-all duration-300" />
-              <span className="text-xl font-bold bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent group-hover:from-soundboard-accent group-hover:to-soundboard-primary transition-all duration-300">
+              <motion.div
+                whileHover={{ 
+                  rotate: [0, -10, 10, -5, 5, 0],
+                  scale: 1.1,
+                  transition: { duration: 0.5 }
+                }}
+                className="flex items-center"
+              >
+                <MusicIcon className="h-8 w-8 text-soundboard-accent animate-pulse-glow" />
+              </motion.div>
+              <motion.span 
+                className="text-xl font-bold bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
                 SoundBoard
-              </span>
+              </motion.span>
             </Link>
           </div>
 
           {/* Desktop nav */}
           <div className="hidden md:flex md:items-center md:space-x-4">
             <Link
-              to="/"
-              className="text-foreground/80 hover:text-soundboard-accent px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              to="/faqs"
+              className="text-foreground/80 hover:text-soundboard-accent px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group"
             >
-              Home
+              <span>FAQs</span>
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </Link>
             <Link
-              to="/dashboard"
-              className="text-foreground/80 hover:text-soundboard-accent px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              to="/pricing"
+              className="text-foreground/80 hover:text-soundboard-accent px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group"
             >
-              Dashboard
+              <span>Pricing</span>
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </Link>
             <Link
-              to="/profile"
-              className="text-foreground/80 hover:text-soundboard-accent px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              to="/blogs"
+              className="text-foreground/80 hover:text-soundboard-accent px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group"
             >
-              Profile
+              <span>Blogs</span>
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </Link>
           </div>
 
@@ -141,25 +158,25 @@ const MainNav = () => {
       <div className={`md:hidden ${isOpen ? "block" : "hidden"}`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t">
           <Link
-            to="/"
+            to="/faqs"
             className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-soundboard-primary/10 hover:text-soundboard-accent"
             onClick={() => setIsOpen(false)}
           >
-            Home
+            FAQs
           </Link>
           <Link
-            to="/dashboard"
+            to="/pricing"
             className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-soundboard-primary/10 hover:text-soundboard-accent"
             onClick={() => setIsOpen(false)}
           >
-            Dashboard
+            Pricing
           </Link>
           <Link
-            to="/profile"
+            to="/blogs"
             className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-soundboard-primary/10 hover:text-soundboard-accent"
             onClick={() => setIsOpen(false)}
           >
-            Profile
+            Blogs
           </Link>
           <div className="pt-4 pb-3 border-t border-muted flex flex-col space-y-2">
             {user ? (

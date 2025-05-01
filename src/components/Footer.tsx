@@ -105,12 +105,12 @@ const Footer = () => {
             <h3 className="text-sm font-semibold mt-6">Pricing</h3>
             <ul className="mt-4 space-y-2">
               <li>
-                <Link to="/" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                <Link to="/pricing" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                   Free Plan
                 </Link>
               </li>
               <li>
-                <Link to="/" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                <Link to="/pricing" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                   Pro Plan (Coming Soon)
                 </Link>
               </li>
@@ -123,12 +123,12 @@ const Footer = () => {
                 <h3 className="text-sm font-semibold">FAQs</h3>
                 <ul className="mt-4 space-y-2">
                   <li>
-                    <Link to="/" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                    <Link to="/faqs" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                       How do I create a Jam Room?
                     </Link>
                   </li>
                   <li>
-                    <Link to="/" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                    <Link to="/faqs" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                       Can I export my mixes?
                     </Link>
                   </li>
@@ -139,12 +139,12 @@ const Footer = () => {
                 <h3 className="text-sm font-semibold">Blog</h3>
                 <ul className="mt-4 space-y-2">
                   <li>
-                    <Link to="/blog" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                    <Link to="/blogs" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                       5 Tips for Better Online Jams
                     </Link>
                   </li>
                   <li>
-                    <Link to="/blog" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                    <Link to="/blogs" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                       How SoundBoard Simplifies Collaboration
                     </Link>
                   </li>
@@ -156,11 +156,15 @@ const Footer = () => {
                 <ul className="mt-4 space-y-2">
                   <li className="flex items-center text-sm text-muted-foreground">
                     <Mail className="h-4 w-4 mr-2" />
-                    support@soundboard.app
+                    <Link to="/contact" className="hover:text-soundboard-accent">
+                      support@soundboard.app
+                    </Link>
                   </li>
                   <li className="flex items-center text-sm text-muted-foreground">
                     <Phone className="h-4 w-4 mr-2" />
-                    +1 234 567 890
+                    <Link to="/contact" className="hover:text-soundboard-accent">
+                      +1 234 567 890
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -229,12 +233,12 @@ const Footer = () => {
               <AccordionContent>
                 <ul className="space-y-2 pl-2">
                   <li>
-                    <Link to="/" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                    <Link to="/pricing" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                       Free Plan
                     </Link>
                   </li>
                   <li>
-                    <Link to="/" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                    <Link to="/pricing" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                       Pro Plan (Coming Soon)
                     </Link>
                   </li>
@@ -247,12 +251,12 @@ const Footer = () => {
               <AccordionContent>
                 <ul className="space-y-2 pl-2">
                   <li>
-                    <Link to="/" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                    <Link to="/faqs" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                       How do I create a Jam Room?
                     </Link>
                   </li>
                   <li>
-                    <Link to="/" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                    <Link to="/faqs" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                       Can I export my mixes?
                     </Link>
                   </li>
@@ -265,12 +269,12 @@ const Footer = () => {
               <AccordionContent>
                 <ul className="space-y-2 pl-2">
                   <li>
-                    <Link to="/blog" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                    <Link to="/blogs" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                       5 Tips for Better Online Jams
                     </Link>
                   </li>
                   <li>
-                    <Link to="/blog" className="text-sm text-muted-foreground hover:text-soundboard-accent">
+                    <Link to="/blogs" className="text-sm text-muted-foreground hover:text-soundboard-accent">
                       How SoundBoard Simplifies Collaboration
                     </Link>
                   </li>
@@ -282,13 +286,17 @@ const Footer = () => {
               <AccordionTrigger>Contact</AccordionTrigger>
               <AccordionContent>
                 <ul className="space-y-2 pl-2">
-                  <li className="flex items-center text-sm text-muted-foreground">
+                  <li className="flex items-center text-sm">
                     <Mail className="h-4 w-4 mr-2" />
-                    support@soundboard.app
+                    <Link to="/contact" className="text-muted-foreground hover:text-soundboard-accent">
+                      support@soundboard.app
+                    </Link>
                   </li>
-                  <li className="flex items-center text-sm text-muted-foreground">
+                  <li className="flex items-center text-sm">
                     <Phone className="h-4 w-4 mr-2" />
-                    +1 234 567 890
+                    <Link to="/contact" className="text-muted-foreground hover:text-soundboard-accent">
+                      +1 234 567 890
+                    </Link>
                   </li>
                 </ul>
               </AccordionContent>

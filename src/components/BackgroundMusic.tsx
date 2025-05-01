@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useLocation } from "react-router-dom";
 
 // We'll use a free ambient music track URL - replace with your own track
 const BACKGROUND_MUSIC_URL = "https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3";
@@ -12,8 +13,14 @@ const BackgroundMusic = () => {
   const [isMuted, setIsMuted] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const location = useLocation();
+  
+  const isHomePage = location.pathname === "/";
   
   useEffect(() => {
+    // Only initialize audio on the home page
+    if (!isHomePage) return;
+    
     // Create the audio element
     const audio = new Audio(BACKGROUND_MUSIC_URL);
     audioRef.current = audio;
@@ -43,7 +50,14 @@ const BackgroundMusic = () => {
         audioRef.current.src = "";
       }
     };
-  }, []);
+  }, [isHomePage]);
+  
+  // When route changes away from homepage, pause audio
+  useEffect(() => {
+    if (!isHomePage && audioRef.current) {
+      audioRef.current.pause();
+    }
+  }, [isHomePage]);
   
   const toggleMute = () => {
     if (audioRef.current) {
@@ -58,6 +72,8 @@ const BackgroundMusic = () => {
       setIsMuted(!isMuted);
     }
   };
+  
+  if (!isHomePage) return null;
   
   return (
     <TooltipProvider>

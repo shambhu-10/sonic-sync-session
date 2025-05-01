@@ -16,7 +16,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import BackgroundMusic from "@/components/BackgroundMusic";
+import ParticleBackground from "@/components/ParticleBackground";
 
 // Featured rooms data
 const featuredRooms = [
@@ -112,14 +112,14 @@ const Index = () => {
 
   return (
     <div className="bg-background text-foreground">
-      {/* Background Music Component */}
-      <BackgroundMusic />
-      
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-soundboard-primary/10 to-background pt-20 pb-40">
         <div className="absolute inset-0 z-0 opacity-20">
           <div className="absolute inset-0 bg-[radial-gradient(#e94560_1px,transparent_1px)] [background-size:20px_20px]"></div>
         </div>
+        
+        {/* Add particle background */}
+        <ParticleBackground />
         
         <motion.div 
           className="container mx-auto px-4 relative z-10"
@@ -129,7 +129,7 @@ const Index = () => {
         >
           <div className="max-w-3xl mx-auto text-center">
             <motion.h1 
-              className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
@@ -138,7 +138,7 @@ const Index = () => {
             </motion.h1>
             
             <motion.p 
-              className="text-xl lg:text-2xl mb-8 text-muted-foreground"
+              className="text-lg sm:text-xl lg:text-2xl mb-8 text-muted-foreground"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -156,7 +156,7 @@ const Index = () => {
                 className="bg-soundboard-accent hover:bg-soundboard-secondary transition-all text-lg px-8 py-6"
                 asChild
               >
-                <Link to={user ? "/dashboard" : "/auth"}>
+                <Link to={user ? "/dashboard" : "/auth?tab=signup"}>
                   Get Started <ArrowRight className="ml-2" />
                 </Link>
               </Button>
@@ -164,6 +164,7 @@ const Index = () => {
               <Button 
                 variant="outline"
                 className="text-lg px-8 py-6"
+                asChild
               >
                 <Link to="#how-it-works">
                   How It Works
@@ -283,7 +284,7 @@ const Index = () => {
               size="lg"
               asChild
             >
-              <Link to={user ? "/dashboard" : "/auth"}>
+              <Link to={user ? "/dashboard" : "/auth?tab=signup"}>
                 Start Creating Now <ChevronRight className="ml-1" />
               </Link>
             </Button>
@@ -357,7 +358,7 @@ const Index = () => {
               size="lg"
               asChild
             >
-              <Link to={user ? "/dashboard" : "/auth"}>
+              <Link to={user ? "/dashboard" : "/auth?tab=signup"}>
                 Explore All Rooms <ChevronRight className="ml-1" />
               </Link>
             </Button>
@@ -482,6 +483,23 @@ const Index = () => {
               </motion.div>
             ))}
           </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="text-center mt-8"
+          >
+            <Button 
+              variant="outline" 
+              className="hover:bg-soundboard-accent/10 hover:text-soundboard-accent"
+              asChild
+            >
+              <Link to="/faqs">
+                View All FAQs <ChevronRight className="ml-1" />
+              </Link>
+            </Button>
+          </motion.div>
         </div>
       </section>
       
@@ -503,7 +521,7 @@ const Index = () => {
               className="bg-white text-soundboard-accent hover:bg-gray-100 hover:text-soundboard-primary transition-all"
               asChild
             >
-              <Link to={user ? "/dashboard" : "/auth"}>
+              <Link to={user ? "/dashboard" : "/auth?tab=signup"}>
                 Create Your First Jam Room <ChevronRight className="ml-1" />
               </Link>
             </Button>

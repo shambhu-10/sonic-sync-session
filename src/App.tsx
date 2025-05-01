@@ -17,6 +17,11 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AnimatePresence } from "framer-motion";
+import Faqs from "./pages/Faqs";
+import Pricing from "./pages/Pricing";
+import Blogs from "./pages/Blogs";
+import Contact from "./pages/Contact";
+import BackgroundMusic from "./components/BackgroundMusic";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +35,7 @@ const App = () => (
             <Sonner />
             <div className="flex flex-col min-h-screen">
               <MainNav />
+              <BackgroundMusic />
               <div className="flex-grow">
                 <AnimatePresence mode="wait">
                   <Routes>
@@ -37,6 +43,10 @@ const App = () => (
                     <Route path="/" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
+                    <Route path="/faqs" element={<Faqs />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/blogs" element={<Blogs />} />
+                    <Route path="/contact" element={<Contact />} />
                     
                     {/* Protected Routes */}
                     <Route element={<ProtectedRoute />}>
