@@ -35,6 +35,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(currentSession);
         
         if (currentSession?.user) {
+          // Show success message for sign in and sign up events
+          if (event === 'SIGNED_IN') {
+            toast.success("Signed in successfully! Welcome back!");
+          } else if (event === 'SIGNED_UP') {
+            toast.success("Account created successfully! Welcome to SoundBoard!");
+          }
+          
           // Use setTimeout to avoid potential deadlocks with Supabase client
           setTimeout(async () => {
             try {
@@ -109,7 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Save session immediately to prevent loss
         setSession(data.session);
         setUser(data.user as any);
-        toast.success("Signed in successfully! Welcome back!");
+        // Success toast is now handled in onAuthStateChange
         navigate("/dashboard");
       }
     } catch (error: any) {
@@ -176,7 +183,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // If auto-confirmed, sign in right away
         setSession(data.session);
         navigate("/dashboard");
-        toast.success("Account created successfully! Welcome to SoundBoard!");
+        // Success toast is now handled in onAuthStateChange
       } else {
         toast.success("Account created successfully!", {
           description: "Please check your email to confirm your account."

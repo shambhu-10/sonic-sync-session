@@ -4,11 +4,9 @@ import RoomCard from "@/components/RoomCard";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { LinkIcon, LockIcon, GlobeIcon } from "lucide-react";
+import { LinkIcon } from "lucide-react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { PlusIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 interface RoomsListProps {
   rooms: Room[];
@@ -76,16 +74,6 @@ const RoomsList = ({
         >
           <div className="relative">
             <RoomCard room={room} />
-            <Badge 
-              variant={room.is_public ? "outline" : "secondary"}
-              className="absolute top-2 right-2"
-            >
-              {room.is_public ? (
-                <><GlobeIcon className="h-3 w-3 mr-1" /> Public</>
-              ) : (
-                <><LockIcon className="h-3 w-3 mr-1" /> Private</>
-              )}
-            </Badge>
           </div>
           
           {showShareButton && (

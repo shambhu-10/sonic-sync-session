@@ -48,17 +48,8 @@ export function useRoomsFetch() {
     
     fetchRooms();
     
-    // Set up an interval to refresh rooms data every 30 seconds if the user is active
-    const intervalId = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        fetchRooms();
-      }
-    }, 30000);
-    
-    // Clean up interval on unmount
-    return () => {
-      clearInterval(intervalId);
-    };
+    // Removing the auto-refresh interval - this was causing the auto-reloading issue
+    // No need for interval or cleanup
   }, [user]);
 
   // Function to refresh rooms manually
