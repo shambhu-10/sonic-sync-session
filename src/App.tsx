@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import JamRoom from "./pages/JamRoom";
@@ -38,104 +38,41 @@ const App = () => {
     setMounted(true);
   }, []);
   
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <NavWrapper>{/* Outlet will be rendered here */}</NavWrapper>,
-      errorElement: <NotFound />,
-      children: [
-        {
-          index: true,
-          element: <Index />,
-        },
-        {
-          path: "auth",
-          element: <Auth />,
-        },
-        {
-          path: "auth/callback",
-          element: <AuthCallback />,
-        },
-        {
-          path: "pricing",
-          element: <Pricing />,
-        },
-        {
-          path: "blogs",
-          element: <Blogs />,
-        },
-        {
-          path: "faqs",
-          element: <Faqs />,
-        },
-        {
-          path: "contact",
-          element: <Contact />,
-        },
-        // New footer content pages
-        {
-          path: "jam-rooms",
-          element: <JamRooms />,
-        },
-        {
-          path: "live-collaboration",
-          element: <LiveCollaboration />,
-        },
-        {
-          path: "loop-recording",
-          element: <LoopRecording />,
-        },
-        {
-          path: "track-mixer",
-          element: <TrackMixer />,
-        },
-        {
-          path: "export-mixdown",
-          element: <ExportMixdown />,
-        },
-        {
-          path: "mobile-app",
-          element: <MobileApp />,
-        },
-        {
-          path: "privacy",
-          element: <Privacy />,
-        },
-        {
-          path: "terms",
-          element: <Terms />,
-        },
-        {
-          path: "cookies",
-          element: <Cookies />,
-        },
-        {
-          element: <ProtectedRoute />,
-          children: [
-            {
-              path: "dashboard",
-              element: <Dashboard />,
-            },
-            {
-              path: "jam/:roomId?",
-              element: <JamRoom />,
-            },
-            {
-              path: "profile",
-              element: <Profile />,
-            },
-          ],
-        },
-      ],
-    },
-  ]);
-
   if (!mounted) return null;
 
   return (
     <ThemeProvider>
       <AuthProvider>
-        <RouterProvider router={router} />
+        <Routes>
+          <Route path="/" element={<NavWrapper>{/* Outlet will be rendered here */}</NavWrapper>}>
+            <Route index element={<Index />} />
+            <Route path="auth" element={<Auth />} />
+            <Route path="auth/callback" element={<AuthCallback />} />
+            <Route path="pricing" element={<Pricing />} />
+            <Route path="blogs" element={<Blogs />} />
+            <Route path="faqs" element={<Faqs />} />
+            <Route path="contact" element={<Contact />} />
+            
+            {/* Footer content pages */}
+            <Route path="jam-rooms" element={<JamRooms />} />
+            <Route path="live-collaboration" element={<LiveCollaboration />} />
+            <Route path="loop-recording" element={<LoopRecording />} />
+            <Route path="track-mixer" element={<TrackMixer />} />
+            <Route path="export-mixdown" element={<ExportMixdown />} />
+            <Route path="mobile-app" element={<MobileApp />} />
+            <Route path="privacy" element={<Privacy />} />
+            <Route path="terms" element={<Terms />} />
+            <Route path="cookies" element={<Cookies />} />
+            
+            {/* Protected routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="jam/:roomId?" element={<JamRoom />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
         <Toaster />
         <SonnerToaster position="top-center" expand={true} richColors />
       </AuthProvider>
