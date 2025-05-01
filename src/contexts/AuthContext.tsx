@@ -26,6 +26,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("Setting up auth state listener");
+    
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
@@ -33,26 +35,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(currentSession);
         
         if (currentSession?.user) {
-          try {
-            const { data, error } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', currentSession.user.id)
-              .single();
+          // Use setTimeout to avoid potential deadlocks with Supabase client
+          setTimeout(async () => {
+            try {
+              const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentSession.user.id)
+                .single();
 
-            if (!error && data) {
-              setUser(data as User);
-            } else if (error) {
-              console.error("Error fetching user profile:", error);
+              if (!error && data) {
+                setUser(data as User);
+              } else if (error) {
+                console.error("Error fetching user profile:", error);
+              }
+            } catch (fetchError) {
+              console.error("Exception fetching user profile:", fetchError);
+            } finally {
+              setLoading(false);
             }
-          } catch (fetchError) {
-            console.error("Exception fetching user profile:", fetchError);
-          }
+          }, 0);
         } else {
           setUser(null);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
@@ -96,9 +102,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      navigate("/dashboard");
+      
+      if (data.session) {
+        // Save session immediately to prevent loss
+        setSession(data.session);
+        setUser(data.user as any);
+        navigate("/dashboard");
+      }
     } catch (error: any) {
       toast.error("Failed to sign in", {
         description: error.message
@@ -110,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, username: string) => {
     try {
-      const { error } = await supabase.auth.signUp({ 
+      const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
         options: {
@@ -121,7 +133,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) throw error;
-      toast.success("Sign up successful! Please check your email to confirm your account.");
+      
+      if (data.session) {
+        // If auto-confirmed, sign in right away
+        setSession(data.session);
+        navigate("/dashboard");
+        toast.success("Sign up successful! Welcome to SoundBoard!");
+      } else {
+        toast.success("Sign up successful! Please check your email to confirm your account.");
+      }
     } catch (error: any) {
       toast.error("Failed to sign up", {
         description: error.message
@@ -134,6 +154,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
+      setSession(null);
+      setUser(null);
       navigate("/");
     } catch (error: any) {
       toast.error("Failed to sign out", {
@@ -145,8 +167,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithProvider = async (provider: "github" | "google") => {
     try {
+      // Store the current path for redirect after auth
+      sessionStorage.setItem('authRedirectPath', '/dashboard');
+      
       // Get the current origin for the redirect URL
       const redirectTo = `${window.location.origin}/auth/callback`;
+      console.log("Setting redirect URL:", redirectTo);
       
       const { data, error } = await supabase.auth.signInWithOAuth({ 
         provider,

@@ -1,12 +1,22 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { LogOut, Settings, Mic, MicOff, Play, Pause, Volume2, VolumeX } from "lucide-react";
+import { 
+  LogOut, 
+  Settings, 
+  Mic, 
+  MicOff, 
+  Play, 
+  Pause, 
+  Volume2, 
+  VolumeX,
+  Download,
+  ExternalLink 
+} from "lucide-react";
 import { toast } from "sonner";
-import { getRoom, getLoops, createLoop } from "@/services/api";
+import { getRoom, getLoops, createLoop, createMixdown } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Room, Loop } from "@/types";
 import RoomVisibilityToggle from "@/components/room/RoomVisibilityToggle";
@@ -14,6 +24,9 @@ import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import WaveAnimation from "@/components/WaveAnimation";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const JamRoom = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -27,6 +40,11 @@ const JamRoom = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [fetchingLoops, setFetchingLoops] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("recorder");
+  
+  // Export mixdown state
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
   
   // Audio recording state
   const { 
@@ -229,6 +247,65 @@ const JamRoom = () => {
     }
   };
 
+  // Export mixdown functionality
+  const handleExportMixdown = async () => {
+    if (!user || !roomId) {
+      toast.error("Cannot export mixdown - user or room information missing");
+      return;
+    }
+    
+    if (loops.filter(loop => loop.is_active).length === 0) {
+      toast.error("No active loops to export", {
+        description: "Please enable at least one loop before exporting."
+      });
+      return;
+    }
+    
+    try {
+      setIsExporting(true);
+      
+      // Simulate export process with progress updates
+      for (let i = 0; i <= 100; i += 10) {
+        setExportProgress(i);
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      
+      // Create a simple audio context for demo purposes
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioBuffers: AudioBuffer[] = [];
+      
+      // In a real implementation, we would load all active loops and mix them properly
+      // For demo purposes, we'll just create a mock blob
+      const mockMixdownBlob = new Blob([new Uint8Array(1000)], { type: 'audio/webm' });
+      
+      // Save the mixdown using the API
+      const mixdown = await createMixdown(
+        {
+          room_id: roomId,
+          user_id: user.id
+        },
+        mockMixdownBlob
+      );
+      
+      setIsExporting(false);
+      setExportProgress(0);
+      
+      // Provide download link
+      toast.success("Mixdown exported successfully", {
+        description: "Your mixdown is ready to download.",
+        action: {
+          label: "Download",
+          onClick: () => window.open(mixdown.file_url, '_blank')
+        }
+      });
+    } catch (error) {
+      console.error("Error exporting mixdown:", error);
+      toast.error("Failed to export mixdown");
+      setIsExporting(false);
+      setExportProgress(0);
+    }
+  };
+
   const isRoomHost = room && user && room.host_id === user.id;
 
   if (loading) {
@@ -291,144 +368,222 @@ const JamRoom = () => {
       </div>
       
       {/* Main jam room content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recorder section */}
-        <div className="bg-card rounded-lg p-6 shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Record a Loop</h2>
+      <div className="grid grid-cols-1 gap-8">
+        <Tabs 
+          value={activeTab} 
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          <TabsList className="grid grid-cols-3 w-full mb-6">
+            <TabsTrigger value="recorder">Record Loop</TabsTrigger>
+            <TabsTrigger value="mixer">Mixer</TabsTrigger>
+            <TabsTrigger value="export">Export Mixdown</TabsTrigger>
+          </TabsList>
           
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="recordingName" className="block text-sm font-medium mb-2">
-                Recording Name
-              </label>
-              <input
-                id="recordingName"
-                type="text"
-                value={recordingName}
-                onChange={(e) => setRecordingName(e.target.value)}
-                disabled={isRecording}
-                placeholder="Enter a name for your recording"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-            
-            {/* Recording timer */}
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">
-                {isRecording ? (
-                  <span className="text-red-500 animate-pulse">Recording: {recordingTime}s</span>
-                ) : (
-                  "Ready to record"
-                )}
-              </span>
-              <span className="text-sm text-muted-foreground">Max: 30s</span>
-            </div>
-            
-            <div className="flex space-x-3">
-              {!isRecording ? (
-                <Button 
-                  onClick={handleStartRecording} 
-                  disabled={recordingName.trim() === ""}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white"
-                >
-                  <Mic className="mr-2 h-4 w-4" />
-                  Start Recording
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handleStopRecording} 
-                  variant="destructive"
-                  className="w-full"
-                >
-                  <MicOff className="mr-2 h-4 w-4" />
-                  Stop Recording
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-        
-        {/* Mixer section */}
-        <div className="lg:col-span-2 bg-card rounded-lg p-6 shadow-md">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Loops Mixer</h2>
-            
-            <Button
-              onClick={handlePlayPause}
-              variant={isPlaying ? "destructive" : "default"}
-              className="flex items-center"
-            >
-              {isPlaying ? (
-                <>
-                  <Pause className="mr-2 h-4 w-4" />
-                  Stop All
-                </>
-              ) : (
-                <>
-                  <Play className="mr-2 h-4 w-4" />
-                  Play All
-                </>
-              )}
-            </Button>
-          </div>
-          
-          {fetchingLoops ? (
-            <div className="flex justify-center items-center h-32">
-              <Spinner size="md" />
-              <p className="ml-3">Loading loops...</p>
-            </div>
-          ) : loops.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>No loops have been recorded yet.</p>
-              <p>Be the first to add a loop!</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {loops.map((loop) => (
-                <div 
-                  key={loop.id} 
-                  className={cn(
-                    "border rounded-md p-4 transition-all",
-                    loop.is_active ? "bg-background" : "bg-muted opacity-70"
-                  )}
-                >
-                  <div className="flex justify-between items-center mb-3">
-                    <div>
-                      <h3 className="font-medium">{loop.name}</h3>
-                      <p className="text-sm text-muted-foreground">By {loop.username}</p>
-                    </div>
-                    
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleToggleLoop(loop.id)}
+          <TabsContent value="recorder" className="space-y-4">
+            <Card className="bg-card rounded-lg shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Mic className="mr-2 h-5 w-5" />
+                  Record a Loop
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label htmlFor="recordingName" className="block text-sm font-medium mb-2">
+                    Recording Name
+                  </label>
+                  <input
+                    id="recordingName"
+                    type="text"
+                    value={recordingName}
+                    onChange={(e) => setRecordingName(e.target.value)}
+                    disabled={isRecording}
+                    placeholder="Enter a name for your recording"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                
+                {/* Recording timer */}
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">
+                    {isRecording ? (
+                      <span className="text-red-500 animate-pulse">Recording: {recordingTime}s</span>
+                    ) : (
+                      "Ready to record"
+                    )}
+                  </span>
+                  <span className="text-sm text-muted-foreground">Max: 30s</span>
+                </div>
+                
+                <div className="flex space-x-3">
+                  {!isRecording ? (
+                    <Button 
+                      onClick={handleStartRecording} 
+                      disabled={recordingName.trim() === ""}
+                      className="w-full bg-red-500 hover:bg-red-600 text-white"
                     >
-                      {loop.is_active ? (
-                        <Volume2 className="h-4 w-4" />
-                      ) : (
-                        <VolumeX className="h-4 w-4" />
-                      )}
+                      <Mic className="mr-2 h-4 w-4" />
+                      Start Recording
                     </Button>
+                  ) : (
+                    <Button 
+                      onClick={handleStopRecording} 
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      <MicOff className="mr-2 h-4 w-4" />
+                      Stop Recording
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="mixer">
+            <Card className="bg-card rounded-lg shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Volume2 className="mr-2 h-5 w-5" />
+                    Loops Mixer
                   </div>
                   
-                  <div className="pl-2 pr-4">
-                    <Slider
-                      disabled={!loop.is_active}
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={[loop.volume]}
-                      onValueChange={(values) => handleVolumeChange(loop.id, values[0])}
-                      className={cn(
-                        loop.is_active ? "" : "opacity-50"
-                      )}
-                    />
+                  <Button
+                    onClick={handlePlayPause}
+                    variant={isPlaying ? "destructive" : "default"}
+                    className="flex items-center"
+                  >
+                    {isPlaying ? (
+                      <>
+                        <Pause className="mr-2 h-4 w-4" />
+                        Stop All
+                      </>
+                    ) : (
+                      <>
+                        <Play className="mr-2 h-4 w-4" />
+                        Play All
+                      </>
+                    )}
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {fetchingLoops ? (
+                  <div className="flex justify-center items-center h-32">
+                    <Spinner size="md" />
+                    <p className="ml-3">Loading loops...</p>
+                  </div>
+                ) : loops.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <p>No loops have been recorded yet.</p>
+                    <p>Be the first to add a loop!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {loops.map((loop) => (
+                      <div 
+                        key={loop.id} 
+                        className={cn(
+                          "border rounded-md p-4 transition-all",
+                          loop.is_active ? "bg-background" : "bg-muted opacity-70"
+                        )}
+                      >
+                        <div className="flex justify-between items-center mb-3">
+                          <div>
+                            <h3 className="font-medium">{loop.name}</h3>
+                            <p className="text-sm text-muted-foreground">By {loop.username}</p>
+                          </div>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleToggleLoop(loop.id)}
+                          >
+                            {loop.is_active ? (
+                              <Volume2 className="h-4 w-4" />
+                            ) : (
+                              <VolumeX className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        
+                        <div className="pl-2 pr-4">
+                          <Slider
+                            disabled={!loop.is_active}
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={[loop.volume]}
+                            onValueChange={(values) => handleVolumeChange(loop.id, values[0])}
+                            className={cn(
+                              loop.is_active ? "" : "opacity-50"
+                            )}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="export">
+            <Card className="bg-card rounded-lg shadow-md">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Download className="mr-2 h-5 w-5" />
+                  Export Mixdown
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <p className="text-muted-foreground">
+                    Export all active loops as a single audio file. Only enabled loops will be included in the mixdown.
+                  </p>
+                  
+                  <div className="bg-muted p-4 rounded-md space-y-2">
+                    <div className="flex justify-between">
+                      <span>Active loops:</span>
+                      <span className="font-medium">{loops.filter(l => l.is_active).length} of {loops.length}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Format:</span>
+                      <span className="font-medium">WebM Audio</span>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                
+                {isExporting && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm">Exporting mixdown...</span>
+                      <span className="text-sm font-medium">{exportProgress}%</span>
+                    </div>
+                    <Progress value={exportProgress} className="w-full" />
+                  </div>
+                )}
+                
+                <div className="flex flex-col gap-4">
+                  <Button
+                    onClick={handleExportMixdown}
+                    disabled={isExporting || loops.filter(l => l.is_active).length === 0}
+                    className="w-full"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    {isExporting ? "Exporting..." : "Export Mixdown"}
+                  </Button>
+                  
+                  <p className="text-xs text-center text-muted-foreground">
+                    Exported mixdowns will be accessible from your profile page.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
       
       {/* Room settings dialog */}

@@ -12,43 +12,46 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Check if we have a hash in the URL (OAuth sign-in)
+        // Check if we have a hash or query parameters in the URL (OAuth sign-in)
         const hash = window.location.hash;
         const query = window.location.search;
         
-        if (hash || query) {
-          setMessage('Completing authentication...');
+        setMessage('Completing authentication...');
+        
+        if (hash && hash.includes('access_token')) {
+          // Handle the hash-based auth (like GitHub)
+          const { data, error } = await supabase.auth.exchangeCodeForSession(hash);
           
-          // Process the OAuth callback
-          // For newer Supabase versions
-          const { data, error } = hash 
-            ? await supabase.auth.exchangeCodeForSession(hash)
-            : await supabase.auth.getSession();
+          if (error) throw error;
           
-          if (error) {
-            throw error;
-          }
-          
-          // Successfully retrieved session from URL
+          console.log("Auth successful with token exchange", !!data.session);
           toast.success('Authentication successful');
           
           // Check for redirect information
           const fromPath = sessionStorage.getItem('authRedirectPath');
-          if (fromPath) {
-            sessionStorage.removeItem('authRedirectPath');
-            navigate(fromPath, { replace: true });
-          } else {
-            navigate('/dashboard', { replace: true });
-          }
+          navigate(fromPath || '/dashboard', { replace: true });
+          return;
+        }
+        
+        if (query && query.includes('code=')) {
+          // Handle the query-based auth (like Google)
+          const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+          
+          if (error) throw error;
+          
+          console.log("Auth successful with code exchange", !!data.session);
+          toast.success('Authentication successful');
+          
+          // Check for redirect information
+          const fromPath = sessionStorage.getItem('authRedirectPath');
+          navigate(fromPath || '/dashboard', { replace: true });
           return;
         }
         
         // For non-OAuth auth flows, check if we have a session
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError) {
-          throw sessionError;
-        }
+        if (sessionError) throw sessionError;
         
         if (sessionData?.session) {
           navigate('/dashboard', { replace: true });
@@ -70,8 +73,9 @@ const AuthCallback = () => {
 
   return (
     <div className="h-screen flex flex-col items-center justify-center">
-      <Spinner size="lg" />
+      <Spinner size="lg" className="text-primary" />
       <p className="mt-4 text-lg text-muted-foreground">{message}</p>
+      <p className="text-sm text-muted-foreground mt-2">You will be redirected shortly...</p>
     </div>
   );
 };

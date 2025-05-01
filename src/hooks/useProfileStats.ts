@@ -40,6 +40,8 @@ export function useProfileStats(user: User | null) {
         if (error) throw error;
         
         if (profile) {
+          console.log("Profile stats fetched:", profile);
+          
           // Calculate average loops per session
           const avgLoops = profile.rooms_hosted > 0 
             ? (profile.loops_recorded / profile.rooms_hosted).toFixed(1) 
@@ -64,15 +66,16 @@ export function useProfileStats(user: User | null) {
     
     // Set up a real-time subscription to profile changes
     const channel = supabase
-      .channel('profile_changes')
+      .channel(`profile_changes_${user.id}`)
       .on('postgres_changes', 
         { 
-          event: 'UPDATE', 
+          event: '*', 
           schema: 'public', 
           table: 'profiles',
           filter: `id=eq.${user.id}`
         },
         (payload) => {
+          console.log("Profile updated in real-time:", payload);
           const updatedProfile = payload.new as any;
           
           // Calculate average loops per session

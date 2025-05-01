@@ -5,25 +5,28 @@ import { Spinner } from "./ui/spinner";
 import { useEffect } from "react";
 
 const ProtectedRoute = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, session } = useAuth();
   const location = useLocation();
 
   // Log for debugging
   useEffect(() => {
-    console.log("ProtectedRoute - User state:", !!user, "Loading:", loading);
-  }, [user, loading]);
+    console.log("ProtectedRoute - User state:", !!user, "Session:", !!session, "Loading:", loading);
+  }, [user, session, loading]);
 
   if (loading) {
     return (
       <div className="h-[80vh] flex flex-col items-center justify-center">
-        <Spinner size="lg" />
+        <Spinner size="lg" className="text-primary" />
         <p className="mt-4 text-lg text-muted-foreground">Verifying your session...</p>
       </div>
     );
   }
 
-  if (!user) {
-    // Redirect to login, but save where they were going
+  if (!user || !session) {
+    // Save current location for redirect after login
+    sessionStorage.setItem('authRedirectPath', location.pathname);
+    
+    // Redirect to login
     return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
 
