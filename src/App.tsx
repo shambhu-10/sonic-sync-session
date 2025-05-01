@@ -41,7 +41,7 @@ const App = () => {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <NavWrapper />,
+      element: <NavWrapper>{/* Outlet will be rendered here */}</NavWrapper>,
       errorElement: <NotFound />,
       children: [
         {

@@ -1,9 +1,10 @@
 
 import { ReactNode, useEffect } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Outlet } from "react-router-dom";
 
 interface NavWrapperProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 const NavWrapper = ({ children }: NavWrapperProps) => {
@@ -54,7 +55,11 @@ const NavWrapper = ({ children }: NavWrapperProps) => {
     };
   }, []);
 
-  return <>{children}</>;
+  return (
+    <>
+      {children || <Outlet />}
+    </>
+  );
 };
 
 export default NavWrapper;
