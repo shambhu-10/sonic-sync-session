@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface JoinRoomFormProps {
   roomCode: string;
@@ -11,6 +13,26 @@ interface JoinRoomFormProps {
 }
 
 const JoinRoomForm = ({ roomCode, setRoomCode, onSubmit }: JoinRoomFormProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!roomCode.trim()) {
+      toast.error("Please enter a room code");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      await onSubmit(e);
+    } catch (error) {
+      console.error("Error joining room:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <motion.div 
       className="mt-12 animate-fade-in"
@@ -23,7 +45,7 @@ const JoinRoomForm = ({ roomCode, setRoomCode, onSubmit }: JoinRoomFormProps) =>
           <CardTitle>Join a Jam Room</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit} className="flex items-center space-x-2">
+          <form onSubmit={handleSubmit} className="flex items-center space-x-2">
             <Input
               placeholder="Enter room code or paste link"
               value={roomCode}
@@ -34,8 +56,9 @@ const JoinRoomForm = ({ roomCode, setRoomCode, onSubmit }: JoinRoomFormProps) =>
             <Button 
               type="submit"
               className="bg-soundboard-accent hover:bg-soundboard-secondary transition-all"
+              disabled={isSubmitting}
             >
-              Join Room
+              {isSubmitting ? 'Joining...' : 'Join Room'}
             </Button>
           </form>
         </CardContent>

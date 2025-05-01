@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Room, Loop, Participant, Mixdown, User, ChatMessage } from "@/types";
 
@@ -46,6 +45,7 @@ export const getRoom = async (roomId: string) => {
     .single();
   
   if (error) {
+    console.error("Error fetching room:", error);
     throw error;
   }
   
@@ -236,17 +236,36 @@ export const getRoomParticipants = async (roomId: string) => {
 };
 
 export const joinRoom = async (roomId: string, userId: string) => {
-  const { data, error } = await supabase
-    .from("room_participants")
-    .insert({ room_id: roomId, user_id: userId })
-    .select()
-    .single();
-  
-  if (error && error.code !== "23505") { // Ignore duplicate key errors
+  try {
+    // First check if the room exists, regardless of privacy settings
+    const { data: roomData, error: roomError } = await supabase
+      .from("rooms")
+      .select("*")
+      .eq("id", roomId)
+      .single();
+    
+    if (roomError) {
+      console.error("Error checking room:", roomError);
+      throw new Error("Room not found or you don't have access");
+    }
+    
+    // Room exists, now try to join it
+    const { data, error } = await supabase
+      .from("room_participants")
+      .insert({ room_id: roomId, user_id: userId })
+      .select()
+      .single();
+    
+    if (error && error.code !== "23505") { // Ignore duplicate key errors
+      console.error("Error joining room:", error);
+      throw error;
+    }
+    
+    return data as Participant;
+  } catch (error) {
+    console.error("Join room error:", error);
     throw error;
   }
-  
-  return data as Participant;
 };
 
 export const leaveRoom = async (roomId: string, userId: string) => {
@@ -269,22 +288,30 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
     throw new Error("Missing required fields for mixdown creation");
   }
   
+  // Generate a unique filename with a timestamp to prevent caching issues
+  const timestamp = new Date().getTime();
+  const filename = `${mixdownData.name || 'mixdown'}-${timestamp}.webm`;
+  
   // Upload audio file to storage
   const fileExt = "webm";
-  const filePath = `mixdowns/${mixdownData.user_id}/${mixdownData.room_id}/${new Date().getTime()}.${fileExt}`;
+  const filePath = `mixdowns/${mixdownData.user_id}/${mixdownData.room_id}/${filename}`;
   
-  const { error: uploadError, data: uploadData } = await supabase.storage
+  const { error: uploadError } = await supabase.storage
     .from("audio")
-    .upload(filePath, audioFile);
+    .upload(filePath, audioFile, {
+      cacheControl: 'no-cache',
+      contentType: 'audio/webm'
+    });
   
   if (uploadError) {
+    console.error("Upload error:", uploadError);
     throw uploadError;
   }
   
-  // Get public URL for the file
+  // Get public URL for the file with cache-busting query parameter
   const { data: { publicUrl } } = supabase.storage
     .from("audio")
-    .getPublicUrl(filePath);
+    .getPublicUrl(`${filePath}?t=${timestamp}`);
   
   // Create mixdown record in database
   const { data, error } = await supabase
@@ -292,12 +319,14 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
     .insert({
       room_id: mixdownData.room_id,
       user_id: mixdownData.user_id,
-      file_url: publicUrl
+      file_url: publicUrl,
+      name: mixdownData.name
     })
     .select()
     .single();
   
   if (error) {
+    console.error("Database error:", error);
     throw error;
   }
   

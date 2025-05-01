@@ -24,10 +24,13 @@ const ProtectedRoute = () => {
 
   if (!user || !session) {
     // Save current location for redirect after login
-    sessionStorage.setItem('authRedirectPath', location.pathname);
+    const currentPath = location.pathname;
+    if (currentPath !== '/auth') {
+      sessionStorage.setItem('authRedirectPath', currentPath);
+    }
     
     // Redirect to login
-    return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
+    return <Navigate to="/auth" replace />;
   }
 
   // If user is authenticated, render the child routes
