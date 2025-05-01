@@ -36,7 +36,7 @@ export function useRoomOperations() {
         title: newRoomTitle,
         description: newRoomDescription,
         bpm: parseInt(newRoomBpm),
-        key_signature: newRoomKey,
+        key: newRoomKey,
         host_id: user.id,
         is_public: newRoomVisibility === "public"
       });
@@ -59,7 +59,7 @@ export function useRoomOperations() {
       setNewRoomKey("C");
       setNewRoomVisibility("public");
       
-      // Navigate to the new room
+      // Navigate to the new room with correct path
       navigate(`/room/${newRoom.id}`);
     } catch (error: any) {
       console.error("Error creating room:", error);
@@ -71,7 +71,7 @@ export function useRoomOperations() {
     }
   };
   
-  // Join room handler - Fixed to properly extract room ID from various formats
+  // Join room handler - Fixed to properly extract room ID and use the correct route
   const handleJoinRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !roomCode) {
@@ -83,11 +83,19 @@ export function useRoomOperations() {
       // Extract room ID from code or link
       let roomId = roomCode.trim();
       
-      // Check if it's a URL and extract the ID
-      if (roomId.includes("/room/")) {
-        const parts = roomId.split("/room/");
-        if (parts.length > 1) {
-          roomId = parts[1].split(/[/?#]/)[0];
+      // Check if it's a URL and extract the ID for both /room/ and /jam/ formats
+      if (roomId.includes("/room/") || roomId.includes("/jam/")) {
+        const pattern = /\/(room|jam)\/([^/?#]+)/;
+        const matches = roomId.match(pattern);
+        
+        if (matches && matches[2]) {
+          roomId = matches[2];
+        } else {
+          // If pattern doesn't match, try fallback extraction
+          const parts = roomId.split(/\/(?:room|jam)\//).filter(Boolean);
+          if (parts.length > 0) {
+            roomId = parts[parts.length - 1].split(/[?#]/)[0].trim();
+          }
         }
       }
       
@@ -101,7 +109,7 @@ export function useRoomOperations() {
       // Reset form field
       setRoomCode("");
       
-      // Redirect to the room
+      // Redirect to the room with the correct path
       navigate(`/room/${roomId}`);
     } catch (error: any) {
       console.error("Error joining room:", error);

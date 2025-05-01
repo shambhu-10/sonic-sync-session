@@ -58,7 +58,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
             <span>0 active</span>
           </div>
           <Button asChild className="bg-soundboard-accent hover:bg-soundboard-secondary transition-all">
-            <Link to={`/jam/${room.id}`}>
+            <Link to={`/room/${room.id}`}>
               Join Session
             </Link>
           </Button>
