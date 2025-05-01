@@ -109,10 +109,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Save session immediately to prevent loss
         setSession(data.session);
         setUser(data.user as any);
+        toast.success("Sign in successful! Welcome back!");
         navigate("/dashboard");
       }
     } catch (error: any) {
-      toast.error("Failed to sign in", {
+      let errorMessage = "Failed to sign in";
+      
+      // Handle specific error cases
+      if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Invalid email or password";
+      } else if (error.message.includes("Email not confirmed")) {
+        errorMessage = "Please verify your email before signing in";
+      }
+      
+      toast.error(errorMessage, {
         description: error.message
       });
       console.error("Sign in error:", error.message);
@@ -122,6 +132,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, username: string) => {
     try {
+      // Check if user already exists
+      const { data: existingUsers, error: checkError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('username', username);
+      
+      if (checkError) {
+        console.error("Error checking for existing user:", checkError);
+      } else if (existingUsers && existingUsers.length > 0) {
+        toast.error("Account creation failed", {
+          description: "Username already taken. Please choose a different username."
+        });
+        return;
+      }
+      
+      // Check if email is already in use
+      const { error: emailCheckError } = await supabase
+        .auth.signInWithPassword({ email, password: "some-random-password-to-check" });
+      
+      // If no error when trying wrong password, email exists
+      if (!emailCheckError || (emailCheckError && emailCheckError.message.includes("Invalid login credentials"))) {
+        toast.error("Account creation failed", {
+          description: "Email address is already registered. Please sign in instead."
+        });
+        return;
+      }
+      
+      // Proceed with sign up if checks pass
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -140,11 +178,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         navigate("/dashboard");
         toast.success("Sign up successful! Welcome to SoundBoard!");
       } else {
-        toast.success("Sign up successful! Please check your email to confirm your account.");
+        toast.success("Sign up successful!", {
+          description: "Please check your email to confirm your account."
+        });
       }
     } catch (error: any) {
-      toast.error("Failed to sign up", {
-        description: error.message
+      let errorMessage = "Failed to sign up";
+      let description = error.message || "Please try again later.";
+      
+      // Handle specific error cases
+      if (error.message.includes("already registered")) {
+        errorMessage = "Email already registered";
+        description = "This email is already in use. Please sign in instead.";
+      }
+      
+      toast.error(errorMessage, {
+        description: description
       });
       console.error("Sign up error:", error.message);
       throw error;
@@ -156,6 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await supabase.auth.signOut();
       setSession(null);
       setUser(null);
+      toast.success("Signed out successfully");
       navigate("/");
     } catch (error: any) {
       toast.error("Failed to sign out", {
@@ -182,6 +232,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) throw error;
+      
+      // Show a toast message indicating the redirect
+      toast.info(`Redirecting to ${provider} for authentication...`);
     } catch (error: any) {
       toast.error(`Failed to sign in with ${provider}`, {
         description: error.message

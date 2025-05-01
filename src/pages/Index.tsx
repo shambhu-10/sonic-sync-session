@@ -49,11 +49,37 @@ const Index = () => {
       }
     }
   };
+  
+  // Logo animation variants
+  const logoVariants = {
+    initial: { scale: 1 },
+    hover: { 
+      scale: 1.1, 
+      rotate: [0, -5, 5, -3, 3, 0],
+      filter: "drop-shadow(0 0 8px rgba(255, 79, 115, 0.6))",
+      transition: { 
+        duration: 0.7,
+        ease: "easeInOut",
+        times: [0, 0.2, 0.4, 0.6, 0.8, 1],
+      }
+    }
+  };
 
   return (
     <div className="relative min-h-[calc(100vh-64px)] flex flex-col">
-      {/* New interactive particle background animation */}
-      <InteractiveParticleBackground />
+      {/* Enhanced interactive particle background with more dynamic effects */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-background via-background to-soundboard-primary/5">
+        <div className="absolute inset-0 opacity-60">
+          <InteractiveParticleBackground />
+        </div>
+        
+        {/* Animated gradient orbs */}
+        <div className="absolute top-1/4 left-1/5 w-96 h-96 rounded-full bg-gradient-to-r from-soundboard-accent/10 to-soundboard-primary/10 blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/5 w-64 h-64 rounded-full bg-gradient-to-r from-soundboard-primary/10 to-soundboard-accent/10 blur-[80px] animate-pulse" style={{ animationDelay: "2s" }}></div>
+        
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj4KICA8cGF0aCBkPSJNNTkuNiA1OS42VjU5LjZWNTkuNnoiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPgogIDxwYXRoIGQ9Ik01OS42IDAuNFYwLjRWMC40eiIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjA1Ii8+CiAgPHBhdGggZD0iTTAuNCA1OS42VjU5LjZWNTkuNnoiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPgogIDxwYXRoIGQ9Ik0wLjQgMC40VjAuNFYwLjR6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KICA8cGF0aCBkPSJNMzAgMC40VjU5LjYiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9IjAuMDMiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgPHBhdGggZD0iTTU5LjYgMzBIMC40IiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIiBzdHJva2Utd2lkdGg9IjAuNSIvPgo8L3N2Zz4=')] opacity-10"></div>
+      </div>
       
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center text-center flex-grow relative z-10">
@@ -65,8 +91,10 @@ const Index = () => {
         >
           <motion.div 
             className="flex items-center justify-center mb-8"
-            whileHover={{ rotate: [0, -10, 10, -5, 5, 0], scale: 1.1 }}
-            transition={{ duration: 0.5 }}
+            variants={logoVariants}
+            initial="initial"
+            whileHover="hover"
+            transition={{ type: "spring", stiffness: 300, damping: 10 }}
           >
             <MusicIcon className="h-16 w-16 text-soundboard-accent" />
           </motion.div>

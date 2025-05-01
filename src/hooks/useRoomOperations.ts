@@ -60,7 +60,7 @@ export function useRoomOperations() {
       setNewRoomVisibility("public");
       
       // Navigate to the new room
-      navigate(`/jam/${newRoom.id}`);
+      navigate(`/room/${newRoom.id}`);
     } catch (error: any) {
       console.error("Error creating room:", error);
       toast.error("Failed to create room", {
@@ -84,9 +84,18 @@ export function useRoomOperations() {
       let roomId = roomCode.trim();
       
       // Check if it's a URL and extract the ID
-      if (roomId.includes("/jam/")) {
-        const parts = roomId.split("/jam/");
-        roomId = parts[parts.length - 1].split("?")[0].split("#")[0].trim();
+      if (roomId.includes("/room/") || roomId.includes("/jam/")) {
+        // Handle both /room/ and /jam/ URL formats
+        const pattern = /\/(room|jam)\/([^/?#]+)/;
+        const matches = roomId.match(pattern);
+        
+        if (matches && matches[2]) {
+          roomId = matches[2];
+        } else {
+          // If pattern doesn't match, split by the last segment that contains /room/ or /jam/
+          const parts = roomId.split(/\/(?:room|jam)\//).filter(Boolean);
+          roomId = parts[parts.length - 1].split(/[?#]/)[0].trim();
+        }
       }
       
       console.log("Attempting to join room with ID:", roomId);
@@ -100,7 +109,7 @@ export function useRoomOperations() {
       setRoomCode("");
       
       // Redirect to the room
-      navigate(`/jam/${roomId}`);
+      navigate(`/room/${roomId}`);
     } catch (error: any) {
       console.error("Error joining room:", error);
       toast.error("Failed to join room", {
