@@ -1,70 +1,69 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { UsersIcon } from "lucide-react";
-import WaveAnimation from "./WaveAnimation";
 import { Link } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Room } from "@/types";
+import { Music, Users, Clock } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface RoomCardProps {
-  id: string;
-  title: string;
-  bpm: number;
-  keySignature: string;
-  trackCount: number;
-  activeUsers?: number;
-  isPublic?: boolean;
+  room: Room;
 }
 
-const RoomCard = ({
-  id,
-  title,
-  bpm,
-  keySignature,
-  trackCount,
-  activeUsers = 0,
-  isPublic = true,
-}: RoomCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-
+const RoomCard = ({ room }: RoomCardProps) => {
+  const timeAgo = formatDistanceToNow(new Date(room.created_at), { addSuffix: true });
+  
   return (
-    <Card
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="overflow-hidden border-border hover:border-soundboard-accent transition-all duration-300 hover:shadow-md hover:shadow-soundboard-primary/20"
-    >
-      <CardContent className="p-0">
-        <div className="bg-gradient-to-r from-soundboard-primary/20 to-soundboard-accent/20 p-6 relative">
-          <div className="absolute inset-0 flex items-center justify-center opacity-10">
-            <WaveAnimation isActive={false} />
-          </div>
-          <h3 className="text-lg font-medium line-clamp-1">{title}</h3>
-          <div className="flex items-center justify-between mt-2 text-sm text-muted-foreground">
-            <div className="flex items-center space-x-4">
-              <span>{bpm} BPM</span>
-              <span>Key: {keySignature}</span>
-            </div>
-            <div className="flex items-center">
-              <UsersIcon size={14} className="mr-1" />
-              <span>{activeUsers} active</span>
+    <Card className="overflow-hidden transition-all hover:shadow-lg">
+      <div className="h-3 bg-soundboard-accent" />
+      <CardContent className="pt-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h3 className="text-lg font-bold mb-1">{room.title}</h3>
+            {room.description && (
+              <p className="text-sm text-muted-foreground mb-3">{room.description}</p>
+            )}
+            <div className="flex items-center space-x-4 text-sm">
+              <div className="flex items-center">
+                <Music className="h-4 w-4 mr-1 text-soundboard-accent" />
+                <span>{room.bpm} BPM</span>
+              </div>
+              <div className="flex items-center">
+                <span className="font-semibold">{room.key_signature}</span>
+              </div>
             </div>
           </div>
-          <div className="mt-4">
-            <WaveAnimation isActive={isHovered} className="h-8" />
+          <div className="flex flex-col items-end">
+            <div className="mb-1">
+              {room.is_public ? (
+                <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
+                  Public
+                </span>
+              ) : (
+                <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 text-xs rounded-full">
+                  Private
+                </span>
+              )}
+            </div>
+            <div className="flex items-center text-xs text-muted-foreground mt-1">
+              <Clock className="h-3 w-3 mr-1" />
+              <span>{timeAgo}</span>
+            </div>
           </div>
         </div>
+        
+        <div className="flex justify-between items-center mt-4">
+          <div className="flex items-center text-sm text-muted-foreground">
+            <Users className="h-4 w-4 mr-1" />
+            <span>0 active</span>
+          </div>
+          <Button asChild className="bg-soundboard-accent hover:bg-soundboard-secondary transition-all">
+            <Link to={`/jam/${room.id}`}>
+              Join Session
+            </Link>
+          </Button>
+        </div>
       </CardContent>
-      <CardFooter className="flex justify-between items-center p-4 bg-card">
-        <div className="text-sm text-muted-foreground">{trackCount} tracks</div>
-        <Button 
-          size="sm"
-          variant="secondary"
-          className="bg-soundboard-accent text-white hover:bg-soundboard-secondary transition-all"
-          asChild
-        >
-          <Link to={`/jam/${id}`}>Join Session</Link>
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

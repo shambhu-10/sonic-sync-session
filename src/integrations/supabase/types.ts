@@ -9,7 +9,245 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loops: {
+        Row: {
+          created_at: string | null
+          file_url: string
+          id: string
+          is_active: boolean | null
+          name: string
+          order_index: number | null
+          room_id: string
+          user_id: string
+          volume: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_url: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          order_index?: number | null
+          room_id: string
+          user_id: string
+          volume?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          file_url?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          order_index?: number | null
+          room_id?: string
+          user_id?: string
+          volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loops_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loops_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mixdowns: {
+        Row: {
+          created_at: string | null
+          file_url: string
+          id: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          file_url: string
+          id?: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          file_url?: string
+          id?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mixdowns_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mixdowns_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          id: string
+          loops_recorded: number | null
+          mixdowns_exported: number | null
+          rooms_hosted: number | null
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id: string
+          loops_recorded?: number | null
+          mixdowns_exported?: number | null
+          rooms_hosted?: number | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id?: string
+          loops_recorded?: number | null
+          mixdowns_exported?: number | null
+          rooms_hosted?: number | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      room_participants: {
+        Row: {
+          joined_at: string | null
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string | null
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string | null
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_participants_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          bpm: number | null
+          created_at: string | null
+          description: string | null
+          host_id: string
+          id: string
+          is_public: boolean | null
+          key_signature: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          bpm?: number | null
+          created_at?: string | null
+          description?: string | null
+          host_id: string
+          id?: string
+          is_public?: boolean | null
+          key_signature?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          bpm?: number | null
+          created_at?: string | null
+          description?: string | null
+          host_id?: string
+          id?: string
+          is_public?: boolean | null
+          key_signature?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
