@@ -76,10 +76,7 @@ export const createRoom = async (roomData: Partial<Room>) => {
   
   // Increment rooms_hosted count for the user
   try {
-    await supabase
-      .from("profiles")
-      .update({ rooms_hosted: supabase.rpc("increment", { inc: 1 }) })
-      .eq("id", roomData.host_id);
+    await supabase.rpc('increment', { inc: 1, column_name: 'rooms_hosted', table_name: 'profiles', row_id: roomData.host_id });
   } catch (err) {
     console.error("Failed to update rooms_hosted count", err);
   }
@@ -152,10 +149,7 @@ export const createLoop = async (loopData: Partial<Loop>, audioFile: Blob) => {
   
   // Increment loops_recorded count for the user
   try {
-    await supabase
-      .from("profiles")
-      .update({ loops_recorded: supabase.rpc("increment", { inc: 1 }) })
-      .eq("id", loopData.user_id);
+    await supabase.rpc('increment', { inc: 1, column_name: 'loops_recorded', table_name: 'profiles', row_id: loopData.user_id });
   } catch (err) {
     console.error("Failed to update loops_recorded count", err);
   }
@@ -280,10 +274,7 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
   
   // Increment mixdowns_exported count for the user
   try {
-    await supabase
-      .from("profiles")
-      .update({ mixdowns_exported: supabase.rpc("increment", { inc: 1 }) })
-      .eq("id", mixdownData.user_id);
+    await supabase.rpc('increment', { inc: 1, column_name: 'mixdowns_exported', table_name: 'profiles', row_id: mixdownData.user_id });
   } catch (err) {
     console.error("Failed to update mixdowns_exported count", err);
   }
