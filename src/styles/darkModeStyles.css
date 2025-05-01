@@ -1,0 +1,11 @@
+
+/* Dark Mode Input Placeholder Fix */
+.dark input::placeholder {
+  color: rgba(229, 231, 235, 0.5) !important; /* Light gray color for dark mode */
+}
+
+.dark textarea::placeholder {
+  color: rgba(229, 231, 235, 0.5) !important;
+}
+
+/* In light mode, leave the defaults */

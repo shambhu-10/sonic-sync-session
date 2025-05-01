@@ -125,18 +125,42 @@ const Index = () => {
         </motion.div>
       </div>
       
-      {/* Features Section */}
+      {/* Features Section - ENHANCED with better typography and visual design */}
       <div className="bg-muted py-20" id="features">
         <div className="container mx-auto px-4">
-          <motion.h2 
-            className="text-3xl font-bold mb-12 text-center"
+          <motion.div 
+            className="text-center mb-12"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.7 }}
           >
-            Create Music Like Never Before
-          </motion.h2>
+            <motion.span 
+              className="inline-block text-soundboard-accent font-medium mb-2"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+            >
+              FEATURES
+            </motion.span>
+            <motion.h2 
+              className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              Create Music Like Never Before
+            </motion.h2>
+            <motion.div 
+              className="h-1 w-20 bg-gradient-to-r from-soundboard-primary to-soundboard-accent rounded-full mx-auto mt-6"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+            ></motion.div>
+          </motion.div>
           
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
@@ -147,9 +171,13 @@ const Index = () => {
           >
             {/* Feature 1 */}
             <motion.div 
-              className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow hover:scale-[1.02] transition-all duration-300"
+              className="bg-background p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group"
               variants={itemVariants}
             >
+              <div className="absolute inset-0 bg-gradient-to-br from-soundboard-primary/5 to-soundboard-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="bg-soundboard-accent/10 p-3 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
+                <Users className="text-soundboard-accent h-6 w-6" />
+              </div>
               <h3 className="text-xl font-bold mb-3">Real-time Collaboration</h3>
               <p className="text-muted-foreground">
                 Create music together with friends or collaborators in real-time, no matter where they are.
@@ -158,9 +186,13 @@ const Index = () => {
             
             {/* Feature 2 */}
             <motion.div 
-              className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow hover:scale-[1.02] transition-all duration-300"
+              className="bg-background p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group"
               variants={itemVariants}
             >
+              <div className="absolute inset-0 bg-gradient-to-br from-soundboard-primary/5 to-soundboard-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="bg-soundboard-accent/10 p-3 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
+                <Headphones className="text-soundboard-accent h-6 w-6" />
+              </div>
               <h3 className="text-xl font-bold mb-3">High-Quality Recording</h3>
               <p className="text-muted-foreground">
                 Record audio loops with professional quality directly in your browser.
@@ -169,9 +201,13 @@ const Index = () => {
             
             {/* Feature 3 */}
             <motion.div 
-              className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow hover:scale-[1.02] transition-all duration-300"
+              className="bg-background p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group"
               variants={itemVariants}
             >
+              <div className="absolute inset-0 bg-gradient-to-br from-soundboard-primary/5 to-soundboard-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="bg-soundboard-accent/10 p-3 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
+                <Download className="text-soundboard-accent h-6 w-6" />
+              </div>
               <h3 className="text-xl font-bold mb-3">Export & Share</h3>
               <p className="text-muted-foreground">
                 Export your creations and share them with the world or keep them private.
@@ -258,21 +294,45 @@ const Index = () => {
         </div>
       </div>
       
-      {/* Testimonials Section with Animation Enhancements */}
+      {/* Testimonials Section with ENHANCED Animation and Visual Design */}
       <div className="bg-muted py-20">
         <div className="container mx-auto px-4">
-          <motion.h2
-            className="text-3xl font-bold mb-12 text-center"
+          <motion.div 
+            className="text-center mb-12"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.7 }}
           >
-            What Musicians Are Saying
-          </motion.h2>
+            <motion.span 
+              className="inline-block text-soundboard-accent font-medium mb-2"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+            >
+              TESTIMONIALS
+            </motion.span>
+            <motion.h2 
+              className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-soundboard-primary to-soundboard-accent bg-clip-text text-transparent"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              What Musicians Are Saying
+            </motion.h2>
+            <motion.div 
+              className="h-1 w-20 bg-gradient-to-r from-soundboard-primary to-soundboard-accent rounded-full mx-auto mt-6"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+            ></motion.div>
+          </motion.div>
           
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -283,44 +343,56 @@ const Index = () => {
                 name: "Alex Johnson",
                 role: "Professional Guitarist",
                 quote: "SoundBoard has completely changed how I collaborate with other musicians across the globe. The real-time jam sessions feel like we're in the same room.",
+                imageIndex: 1
               },
               {
                 name: "Samantha Lee",
                 role: "Music Producer",
                 quote: "As a producer, I love how easy it is to collect ideas and loops from different artists. The interface is intuitive and the sound quality is excellent.",
+                imageIndex: 2
               },
               {
                 name: "Marcus Davis",
                 role: "Bedroom Beatmaker",
                 quote: "I've gone from making beats alone in my room to collaborating with artists worldwide. This platform has opened so many doors for my music career.",
+                imageIndex: 3
               },
             ].map((testimonial, index) => (
               <motion.div
                 key={index}
-                className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                className="bg-background p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border border-transparent hover:border-soundboard-accent/20 relative overflow-hidden"
                 variants={itemVariants}
                 whileHover={{ 
                   y: -5,
                   boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
                 }}
               >
-                <div className="flex items-center mb-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-soundboard-accent flex items-center justify-center text-white font-bold">
-                      {testimonial.name.charAt(0)}
+                {/* Decorative gradient corner */}
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br from-soundboard-primary/20 to-soundboard-accent/20 rounded-full blur-xl"></div>
+                
+                <div className="z-10 relative">
+                  <div className="flex items-center mb-6">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-r from-soundboard-primary to-soundboard-accent flex items-center justify-center text-white text-lg font-bold">
+                        {testimonial.name.charAt(0)}
+                      </div>
+                    </div>
+                    <div className="ml-4">
+                      <h4 className="font-semibold text-lg">{testimonial.name}</h4>
+                      <p className="text-sm text-soundboard-accent">{testimonial.role}</p>
                     </div>
                   </div>
-                  <div className="ml-3">
-                    <h4 className="font-semibold">{testimonial.name}</h4>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                  <div className="flex mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                    ))}
                   </div>
+                  <p className="text-muted-foreground italic relative">
+                    <span className="text-4xl absolute -top-3 -left-2 text-soundboard-accent/20">"</span>
+                    <span className="relative">{testimonial.quote}</span>
+                    <span className="text-4xl absolute -bottom-6 -right-2 text-soundboard-accent/20">"</span>
+                  </p>
                 </div>
-                <div className="flex mb-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground italic">"{testimonial.quote}"</p>
               </motion.div>
             ))}
           </motion.div>
