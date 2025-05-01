@@ -1,13 +1,14 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
   MusicIcon, 
   MenuIcon, 
   XIcon, 
   User,
-  LogOut
+  LogOut,
+  LayoutDashboard
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -25,6 +26,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const MainNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const location = useLocation();
 
   const toggleMenu = () => setIsOpen(!isOpen);
   
@@ -37,6 +39,11 @@ const MainNav = () => {
   const getUserInitials = () => {
     if (!user || !user.username) return "U";
     return user.username.substring(0, 2).toUpperCase();
+  };
+
+  // Check if the current route matches the provided path
+  const isActive = (path: string) => {
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -67,26 +74,74 @@ const MainNav = () => {
 
           {/* Desktop nav */}
           <div className="hidden md:flex md:items-center md:space-x-4">
+            {user && (
+              <>
+                <Link
+                  to="/dashboard"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group ${
+                    isActive('/dashboard') 
+                      ? 'text-soundboard-accent' 
+                      : 'text-foreground/80 hover:text-soundboard-accent'
+                  }`}
+                >
+                  <span>Dashboard</span>
+                  <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform ${
+                    isActive('/dashboard') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  } transition-transform duration-300 origin-left`}></span>
+                </Link>
+                <Link
+                  to="/profile"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group ${
+                    isActive('/profile') 
+                      ? 'text-soundboard-accent' 
+                      : 'text-foreground/80 hover:text-soundboard-accent'
+                  }`}
+                >
+                  <span>Profile</span>
+                  <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform ${
+                    isActive('/profile') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  } transition-transform duration-300 origin-left`}></span>
+                </Link>
+              </>
+            )}
             <Link
               to="/faqs"
-              className="text-foreground/80 hover:text-soundboard-accent px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group"
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group ${
+                isActive('/faqs') 
+                  ? 'text-soundboard-accent' 
+                  : 'text-foreground/80 hover:text-soundboard-accent'
+              }`}
             >
               <span>FAQs</span>
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+              <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform ${
+                isActive('/faqs') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+              } transition-transform duration-300 origin-left`}></span>
             </Link>
             <Link
               to="/pricing"
-              className="text-foreground/80 hover:text-soundboard-accent px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group"
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group ${
+                isActive('/pricing') 
+                  ? 'text-soundboard-accent' 
+                  : 'text-foreground/80 hover:text-soundboard-accent'
+              }`}
             >
               <span>Pricing</span>
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+              <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform ${
+                isActive('/pricing') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+              } transition-transform duration-300 origin-left`}></span>
             </Link>
             <Link
               to="/blogs"
-              className="text-foreground/80 hover:text-soundboard-accent px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group"
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors relative overflow-hidden group ${
+                isActive('/blogs') 
+                  ? 'text-soundboard-accent' 
+                  : 'text-foreground/80 hover:text-soundboard-accent'
+              }`}
             >
               <span>Blogs</span>
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+              <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-soundboard-accent transform ${
+                isActive('/blogs') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+              } transition-transform duration-300 origin-left`}></span>
             </Link>
           </div>
 
@@ -109,6 +164,12 @@ const MainNav = () => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
@@ -164,6 +225,24 @@ const MainNav = () => {
       {/* Mobile menu, show/hide based on menu state */}
       <div className={`md:hidden ${isOpen ? "block" : "hidden"}`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t">
+          {user && (
+            <>
+              <Link
+                to="/dashboard"
+                className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-soundboard-primary/10 hover:text-soundboard-accent"
+                onClick={() => setIsOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/profile"
+                className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-soundboard-primary/10 hover:text-soundboard-accent"
+                onClick={() => setIsOpen(false)}
+              >
+                Profile
+              </Link>
+            </>
+          )}
           <Link
             to="/faqs"
             className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-soundboard-primary/10 hover:text-soundboard-accent"

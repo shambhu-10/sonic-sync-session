@@ -4,10 +4,11 @@ import RoomCard from "@/components/RoomCard";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { LinkIcon } from "lucide-react";
+import { LinkIcon, LockIcon, GlobeIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { PlusIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface RoomsListProps {
   rooms: Room[];
@@ -29,15 +30,16 @@ const RoomsList = ({
   // Copy room link handler
   const copyRoomLink = (roomId: string) => {
     navigator.clipboard.writeText(`${window.location.origin}/jam/${roomId}`);
-    toast("Link copied to clipboard", {
+    toast.success("Link copied to clipboard", {
       description: "Share this link with your collaborators."
     });
   };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
-        <Spinner size="lg" />
+      <div className="flex flex-col justify-center items-center py-12">
+        <Spinner size="lg" className="mb-4" />
+        <p className="text-muted-foreground">Loading rooms...</p>
       </div>
     );
   }
@@ -50,15 +52,13 @@ const RoomsList = ({
           {emptyMessage}
         </p>
         {emptyActionLabel && setDialogOpen && (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="bg-soundboard-accent hover:bg-soundboard-secondary transition-all">
-                <PlusIcon className="mr-2 h-4 w-4" />
-                {emptyActionLabel}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>{/* Dialog content will be rendered from parent */}</DialogContent>
-          </Dialog>
+          <Button 
+            className="bg-soundboard-accent hover:bg-soundboard-secondary transition-all"
+            onClick={() => setDialogOpen(true)}
+          >
+            <PlusIcon className="mr-2 h-4 w-4" />
+            {emptyActionLabel}
+          </Button>
         )}
       </div>
     );
@@ -66,15 +66,28 @@ const RoomsList = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {rooms.map((room) => (
+      {rooms.map((room, index) => (
         <motion.div 
           key={room.id} 
           className="group"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, delay: index * 0.1 }}
         >
-          <RoomCard room={room} />
+          <div className="relative">
+            <RoomCard room={room} />
+            <Badge 
+              variant={room.is_public ? "outline" : "secondary"}
+              className="absolute top-2 right-2"
+            >
+              {room.is_public ? (
+                <><GlobeIcon className="h-3 w-3 mr-1" /> Public</>
+              ) : (
+                <><LockIcon className="h-3 w-3 mr-1" /> Private</>
+              )}
+            </Badge>
+          </div>
+          
           {showShareButton && (
             <div className="mt-2 flex justify-end">
               <Button

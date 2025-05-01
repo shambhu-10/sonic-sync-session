@@ -43,7 +43,8 @@ const Dashboard = () => {
     myRooms,
     recentRooms,
     isLoadingMyRooms,
-    isLoadingRecentRooms
+    isLoadingRecentRooms,
+    refreshRooms
   } = useRoomsFetch();
 
   return (
@@ -61,6 +62,7 @@ const Dashboard = () => {
         isLoadingMyRooms={isLoadingMyRooms}
         isLoadingRecentRooms={isLoadingRecentRooms}
         setDialogOpen={setDialogOpen}
+        refreshRooms={refreshRooms}
       />
 
       {/* Join Room Form */}
