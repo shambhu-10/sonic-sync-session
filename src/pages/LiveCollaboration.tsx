@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Users, Zap, Clock, Globe, Headphones, Messages, Music, Video } from "lucide-react";
+import { Users, Zap, Clock, Globe, Headphones, MessageSquare, Music, Video } from "lucide-react";
 import useAnimatedVariants from "@/hooks/useAnimatedVariants";
 import { Link } from "react-router-dom";
 
@@ -41,7 +41,7 @@ const LiveCollaboration = () => {
       description: "Record your part while listening to what others are playing."
     },
     {
-      icon: Messages,
+      icon: MessageSquare,
       title: "Communicate",
       description: "Use built-in chat or video to discuss ideas and give feedback."
     },
