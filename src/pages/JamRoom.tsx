@@ -74,11 +74,11 @@ const JamRoom = () => {
   const audioElements = useRef<{ [key: string]: HTMLAudioElement }>({});
   const audioContextRef = useRef<AudioContext | null>(null);
   
-  // FIX 3: Prevent unwanted refreshes by ensuring effects don't run unnecessarily
+  // Prevent unwanted refreshes by ensuring effects don't run unnecessarily
   // Added ref to track if initial data was loaded to prevent repeated fetches
   const initialLoadRef = useRef(false);
   
-  // FIX 2: Add a state to track if already attempted to join room
+  // Add a state to track if already attempted to join room
   const [joinAttempted, setJoinAttempted] = useState(false);
 
   useEffect(() => {
@@ -90,7 +90,7 @@ const JamRoom = () => {
         let roomData = null;
         
         try {
-          // FIX 2: First try to get room directly
+          // First try to get room directly
           roomData = await getRoom(roomId);
         } catch (e) {
           console.log("Error getting room directly, trying to join:", e);
@@ -130,7 +130,7 @@ const JamRoom = () => {
     
     fetchRoom();
     
-    // FIX 3: Less frequent polling and prevent multiple active intervals
+    // Less frequent polling and prevent multiple active intervals
     // Only refresh when visible and with longer interval
     const intervalId = setInterval(() => {
       if (document.visibilityState === 'visible' && roomId && user && initialLoadRef.current) {
@@ -162,7 +162,7 @@ const JamRoom = () => {
       setFetchingLoops(true);
       const fetchedLoops = await getLoops(roomId);
       
-      // FIX 3: Compare loops before setting state to prevent unnecessary re-renders
+      // Compare loops before setting state to prevent unnecessary re-renders
       const loopsChanged = JSON.stringify(fetchedLoops) !== JSON.stringify(loops);
       
       if (loopsChanged) {
@@ -758,11 +758,7 @@ const JamRoom = () => {
                     onChange={(e) => setRecordingName(e.target.value)}
                     disabled={isRecording}
                     placeholder="Enter a name for your recording"
-<<<<<<< HEAD
                     className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary recording-name-input"
-=======
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground placeholder:text-muted-foreground"
->>>>>>> 18483a1 (change the record loop input text color)
                   />
                 </div>
                 
