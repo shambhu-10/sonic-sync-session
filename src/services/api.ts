@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Room, Loop, Participant, Mixdown, User, ChatMessage } from "@/types";
 
@@ -10,7 +11,7 @@ export const getRooms = async (isPublic: boolean = true, limit: number = 10) => 
     .limit(limit);
   
   if (isPublic) {
-    query.eq("is_public", true as any);
+    query.eq("is_public", true);
   }
   
   const { data, error } = await query;
@@ -19,14 +20,14 @@ export const getRooms = async (isPublic: boolean = true, limit: number = 10) => 
     throw error;
   }
   
-  return data as unknown as Room[];
+  return data as Room[];
 };
 
 export const getMyRooms = async (userId: string, limit: number = 10) => {
   const { data, error } = await supabase
     .from("rooms")
     .select("*")
-    .eq("host_id", userId as any)
+    .eq("host_id", userId)
     .order("created_at", { ascending: false })
     .limit(limit);
   
@@ -34,7 +35,7 @@ export const getMyRooms = async (userId: string, limit: number = 10) => {
     throw error;
   }
   
-  return data as unknown as Room[];
+  return data as Room[];
 };
 
 export const getRoom = async (roomId: string) => {
@@ -261,7 +262,7 @@ export const joinRoom = async (roomId: string, userId: string) => {
       throw error;
     }
     
-    return data as Participant;
+    return roomData as Room;
   } catch (error) {
     console.error("Join room error:", error);
     throw error;
@@ -335,7 +336,7 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
     const { data: profileData, error: profileError } = await supabase
       .from("profiles")
       .select("mixdowns_exported")
-      .eq("id", mixdownData.user_id as any)
+      .eq("id", mixdownData.user_id)
       .single();
     
     if (!profileError && profileData) {
@@ -344,7 +345,7 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
       await supabase
         .from("profiles")
         .update({ mixdowns_exported: currentCount + 1 })
-        .eq("id", mixdownData.user_id as any);
+        .eq("id", mixdownData.user_id);
     }
   } catch (err) {
     console.error("Failed to update mixdowns_exported count", err);

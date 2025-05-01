@@ -25,7 +25,7 @@ const ProtectedRoute = () => {
   if (!user || !session) {
     // Save current location for redirect after login
     const currentPath = location.pathname;
-    if (currentPath !== '/auth') {
+    if (currentPath !== '/auth' && currentPath !== '/') {
       sessionStorage.setItem('authRedirectPath', currentPath);
     }
     

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
@@ -266,10 +265,15 @@ const JamRoom = () => {
       setIsExporting(true);
       
       // Show progress updates to user
-      for (let i = 0; i <= 100; i += 10) {
-        setExportProgress(i);
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
+      let progressInterval = setInterval(() => {
+        setExportProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
       
       // Create a simple audio context for mixing
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -294,20 +298,26 @@ const JamRoom = () => {
         mockMixdownBlob
       );
       
-      setIsExporting(false);
-      setExportProgress(0);
+      clearInterval(progressInterval);
+      setExportProgress(100);
       
-      // Provide download link with explicit download functionality
-      const downloadLink = document.createElement('a');
-      downloadLink.href = mixdown.file_url;
-      downloadLink.download = `${room.title.replace(/\s+/g, '-')}-mixdown.webm`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-      
-      toast.success("Mixdown exported successfully", {
-        description: "Your mixdown has been downloaded and saved to your profile."
-      });
+      // Short pause at 100% before resetting
+      setTimeout(() => {
+        setIsExporting(false);
+        setExportProgress(0);
+        
+        // Provide download link with explicit download functionality
+        const downloadLink = document.createElement('a');
+        downloadLink.href = mixdown.file_url;
+        downloadLink.download = `${room?.title.replace(/\s+/g, '-') || 'mixdown'}-${new Date().getTime()}.webm`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        toast.success("Mixdown exported successfully", {
+          description: "Your mixdown has been downloaded and saved to your profile."
+        });
+      }, 500);
       
     } catch (error) {
       console.error("Error exporting mixdown:", error);
@@ -346,13 +356,13 @@ const JamRoom = () => {
       {/* Header section with room title and action buttons */}
       <div className="flex justify-between items-center mb-8 border-b pb-4">
         <div>
-          <h1 className="text-3xl font-bold">{room.title}</h1>
-          <p className="text-muted-foreground">{room.description || "No description"}</p>
+          <h1 className="text-3xl font-bold">{room?.title}</h1>
+          <p className="text-muted-foreground">{room?.description || "No description"}</p>
           <div className="flex items-center gap-4 mt-2">
-            <span className="text-sm font-medium">BPM: {room.bpm}</span>
-            <span className="text-sm font-medium">Key: {room.key_signature}</span>
+            <span className="text-sm font-medium">BPM: {room?.bpm}</span>
+            <span className="text-sm font-medium">Key: {room?.key_signature}</span>
             <span className="text-sm font-medium">
-              Visibility: {room.is_public ? "Public" : "Private"}
+              Visibility: {room?.is_public ? "Public" : "Private"}
             </span>
           </div>
         </div>
@@ -608,12 +618,12 @@ const JamRoom = () => {
             <div className="space-y-2">
               <h3 className="text-sm font-medium">Room Visibility</h3>
               <RoomVisibilityToggle
-                roomId={roomId}
-                initialVisibility={room.is_public}
+                roomId={roomId || ""}
+                initialVisibility={room?.is_public || false}
                 isHost={!!isRoomHost}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {room.is_public 
+                {room?.is_public 
                   ? "Public rooms are visible to all users and can be accessed by anyone." 
                   : "Private rooms are only accessible via direct link or invitation."}
               </p>

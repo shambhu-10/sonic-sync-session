@@ -86,13 +86,13 @@ export function useRoomOperations() {
       // Check if it's a URL and extract the ID
       if (roomId.includes("/jam/")) {
         const parts = roomId.split("/jam/");
-        roomId = parts[parts.length - 1];
+        roomId = parts[parts.length - 1].split("?")[0].split("#")[0].trim();
       }
       
       console.log("Attempting to join room with ID:", roomId);
       
       // Attempt to join the room
-      await joinRoom(roomId, user.id);
+      const roomData = await joinRoom(roomId, user.id);
       
       toast.success("Successfully joined the room!");
       
