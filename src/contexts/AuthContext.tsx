@@ -126,12 +126,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithProvider = async (provider: "github" | "google") => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({ 
+      // Get the current origin for the redirect URL
+      const redirectTo = `${window.location.origin}/auth/callback`;
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({ 
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: redirectTo
         }
       });
+      
       if (error) throw error;
     } catch (error: any) {
       toast.error(`Failed to sign in with ${provider}`, {

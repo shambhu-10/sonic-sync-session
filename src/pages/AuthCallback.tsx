@@ -1,25 +1,52 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Spinner } from '@/components/ui/spinner';
+import { toast } from 'sonner';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const [message, setMessage] = useState<string>('Processing your authentication...');
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { error } = await supabase.auth.getSession();
-        
-        if (error) {
-          throw error;
+        // Check if we have a hash in the URL (OAuth sign-in)
+        if (window.location.hash) {
+          setMessage('Completing OAuth authentication...');
+          
+          // Exchange the code for a session
+          const { data, error } = await supabase.auth.getSessionFromUrl();
+          
+          if (error) {
+            throw error;
+          }
+          
+          // Successfully retrieved session from URL
+          toast.success('Authentication successful');
+          navigate('/dashboard', { replace: true });
+          return;
         }
         
-        // Redirect to dashboard after successful authentication
-        navigate('/dashboard', { replace: true });
-      } catch (error) {
+        // For non-OAuth auth flows, check if we have a session
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          throw sessionError;
+        }
+        
+        if (sessionData?.session) {
+          navigate('/dashboard', { replace: true });
+        } else {
+          // No session found, redirect to auth page
+          navigate('/auth', { replace: true });
+        }
+      } catch (error: any) {
         console.error('Error during auth callback:', error);
+        toast.error('Authentication failed', {
+          description: error.message || 'Please try again'
+        });
         navigate('/auth', { replace: true });
       }
     };
@@ -30,7 +57,7 @@ const AuthCallback = () => {
   return (
     <div className="h-screen flex flex-col items-center justify-center">
       <Spinner size="lg" />
-      <p className="mt-4 text-lg text-muted-foreground">Completing authentication...</p>
+      <p className="mt-4 text-lg text-muted-foreground">{message}</p>
     </div>
   );
 };
