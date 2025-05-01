@@ -23,49 +23,53 @@ import Blogs from "./pages/Blogs";
 import Contact from "./pages/Contact";
 import BackgroundMusic from "./components/BackgroundMusic";
 
+// Create query client instance outside of the component
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
-        <ThemeProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <div className="flex flex-col min-h-screen">
-              <MainNav />
-              <BackgroundMusic />
-              <div className="flex-grow">
-                <AnimatePresence mode="wait">
-                  <Routes>
-                    {/* Public Routes */}
-                    <Route path="/" element={<Index />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/auth/callback" element={<AuthCallback />} />
-                    <Route path="/faqs" element={<Faqs />} />
-                    <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/blogs" element={<Blogs />} />
-                    <Route path="/contact" element={<Contact />} />
-                    
-                    {/* Protected Routes */}
-                    <Route element={<ProtectedRoute />}>
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/jam/:roomId" element={<JamRoom />} />
-                      <Route path="/profile" element={<Profile />} />
-                    </Route>
-                    
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </AnimatePresence>
+// Define App component as a proper function component
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <ThemeProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <div className="flex flex-col min-h-screen">
+                <MainNav />
+                <BackgroundMusic />
+                <div className="flex-grow">
+                  <AnimatePresence mode="wait">
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route path="/" element={<Index />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/auth/callback" element={<AuthCallback />} />
+                      <Route path="/faqs" element={<Faqs />} />
+                      <Route path="/pricing" element={<Pricing />} />
+                      <Route path="/blogs" element={<Blogs />} />
+                      <Route path="/contact" element={<Contact />} />
+                      
+                      {/* Protected Routes */}
+                      <Route element={<ProtectedRoute />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/jam/:roomId" element={<JamRoom />} />
+                        <Route path="/profile" element={<Profile />} />
+                      </Route>
+                      
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </AnimatePresence>
+                </div>
+                <Footer />
               </div>
-              <Footer />
-            </div>
-          </TooltipProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+            </TooltipProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
