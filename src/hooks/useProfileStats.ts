@@ -34,7 +34,7 @@ export function useProfileStats(user: User | null) {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', user.id as any)
           .single();
           
         if (error) throw error;
@@ -42,15 +42,20 @@ export function useProfileStats(user: User | null) {
         if (profile) {
           console.log("Profile stats fetched:", profile);
           
+          // Extract the data safely with defaults
+          const roomsHosted = profile.rooms_hosted || 0;
+          const loopsRecorded = profile.loops_recorded || 0;
+          const mixdownsExported = profile.mixdowns_exported || 0;
+          
           // Calculate average loops per session
-          const avgLoops = profile.rooms_hosted > 0 
-            ? (profile.loops_recorded / profile.rooms_hosted).toFixed(1) 
+          const avgLoops = roomsHosted > 0 
+            ? (loopsRecorded / roomsHosted).toFixed(1) 
             : "0.0";
             
           setStats({
-            roomsHosted: profile.rooms_hosted || 0,
-            loopsRecorded: profile.loops_recorded || 0,
-            mixdownsExported: profile.mixdowns_exported || 0,
+            roomsHosted,
+            loopsRecorded,
+            mixdownsExported,
             avgLoopsPerSession: avgLoops
           });
         }
@@ -78,17 +83,24 @@ export function useProfileStats(user: User | null) {
           console.log("Profile updated in real-time:", payload);
           const updatedProfile = payload.new as any;
           
-          // Calculate average loops per session
-          const avgLoops = updatedProfile.rooms_hosted > 0 
-            ? (updatedProfile.loops_recorded / updatedProfile.rooms_hosted).toFixed(1) 
-            : "0.0";
+          if (updatedProfile) {
+            // Extract the data safely with defaults
+            const roomsHosted = updatedProfile.rooms_hosted || 0;
+            const loopsRecorded = updatedProfile.loops_recorded || 0;
+            const mixdownsExported = updatedProfile.mixdowns_exported || 0;
             
-          setStats({
-            roomsHosted: updatedProfile.rooms_hosted || 0,
-            loopsRecorded: updatedProfile.loops_recorded || 0,
-            mixdownsExported: updatedProfile.mixdowns_exported || 0,
-            avgLoopsPerSession: avgLoops
-          });
+            // Calculate average loops per session
+            const avgLoops = roomsHosted > 0 
+              ? (loopsRecorded / roomsHosted).toFixed(1) 
+              : "0.0";
+              
+            setStats({
+              roomsHosted,
+              loopsRecorded,
+              mixdownsExported,
+              avgLoopsPerSession: avgLoops
+            });
+          }
         }
       )
       .subscribe();

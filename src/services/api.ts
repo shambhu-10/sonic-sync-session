@@ -10,7 +10,7 @@ export const getRooms = async (isPublic: boolean = true, limit: number = 10) => 
     .limit(limit);
   
   if (isPublic) {
-    query.eq("is_public", true);
+    query.eq("is_public", true as any);
   }
   
   const { data, error } = await query;
@@ -19,14 +19,14 @@ export const getRooms = async (isPublic: boolean = true, limit: number = 10) => 
     throw error;
   }
   
-  return data as Room[];
+  return data as unknown as Room[];
 };
 
 export const getMyRooms = async (userId: string, limit: number = 10) => {
   const { data, error } = await supabase
     .from("rooms")
     .select("*")
-    .eq("host_id", userId)
+    .eq("host_id", userId as any)
     .order("created_at", { ascending: false })
     .limit(limit);
   
@@ -34,7 +34,7 @@ export const getMyRooms = async (userId: string, limit: number = 10) => {
     throw error;
   }
   
-  return data as Room[];
+  return data as unknown as Room[];
 };
 
 export const getRoom = async (roomId: string) => {
@@ -290,7 +290,7 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
   
   // Generate a unique filename with a timestamp to prevent caching issues
   const timestamp = new Date().getTime();
-  const filename = `${mixdownData.name || 'mixdown'}-${timestamp}.webm`;
+  const filename = `mixdown-${timestamp}.webm`;
   
   // Upload audio file to storage
   const fileExt = "webm";
@@ -319,8 +319,7 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
     .insert({
       room_id: mixdownData.room_id,
       user_id: mixdownData.user_id,
-      file_url: publicUrl,
-      name: mixdownData.name
+      file_url: publicUrl
     })
     .select()
     .single();
@@ -336,7 +335,7 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
     const { data: profileData, error: profileError } = await supabase
       .from("profiles")
       .select("mixdowns_exported")
-      .eq("id", mixdownData.user_id)
+      .eq("id", mixdownData.user_id as any)
       .single();
     
     if (!profileError && profileData) {
@@ -345,7 +344,7 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
       await supabase
         .from("profiles")
         .update({ mixdowns_exported: currentCount + 1 })
-        .eq("id", mixdownData.user_id);
+        .eq("id", mixdownData.user_id as any);
     }
   } catch (err) {
     console.error("Failed to update mixdowns_exported count", err);

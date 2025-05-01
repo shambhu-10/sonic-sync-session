@@ -282,12 +282,14 @@ const JamRoom = () => {
       const mockMixdownBlob = new Blob([new Uint8Array(10000)], { type: 'audio/webm' });
       
       // Save the mixdown using the API
+      const mixdownData: Partial<Mixdown> = {
+        room_id: roomId,
+        user_id: user.id,
+      };
+      
+      // Call the API with the mixdown data
       const mixdown = await createMixdown(
-        {
-          room_id: roomId,
-          user_id: user.id,
-          name: `${room.title} - Mixdown ${new Date().toLocaleString()}`
-        },
+        mixdownData,
         mockMixdownBlob
       );
       

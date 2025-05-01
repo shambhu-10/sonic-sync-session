@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { getMixdowns, updateProfile } from "@/services/api";
+import { updateProfile } from "@/services/api";
 import { Mixdown } from "@/types";
 import { Spinner } from "@/components/ui/spinner";
 import { formatDistanceToNow } from "date-fns";
@@ -58,12 +57,12 @@ const Profile = () => {
           const { data: rooms, error: roomsError } = await supabase
             .from("rooms")
             .select("id")
-            .eq("host_id", user.id);
+            .eq("host_id", user.id as any);
           
           if (roomsError) throw roomsError;
           
           // Get mixdowns for those rooms
-          const roomIds = rooms.map(room => room.id);
+          const roomIds = rooms ? rooms.map(room => room.id) : [];
           
           if (roomIds.length > 0) {
             const { data: mixdownData, error: mixdownsError } = await supabase
@@ -79,11 +78,13 @@ const Profile = () => {
             
             if (mixdownsError) throw mixdownsError;
             
-            setMixdowns(mixdownData.map(mixdown => ({
-              ...mixdown,
-              roomTitle: mixdown.rooms?.title,
-              username: mixdown.profiles?.username
-            })));
+            if (mixdownData) {
+              setMixdowns(mixdownData.map(mixdown => ({
+                ...mixdown,
+                roomTitle: mixdown.rooms?.title,
+                username: mixdown.profiles?.username
+              })));
+            }
           }
         } catch (error) {
           console.error("Error fetching mixdowns:", error);

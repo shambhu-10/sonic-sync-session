@@ -31,8 +31,8 @@ export default function RoomVisibilityToggle({
       
       const { error } = await supabase
         .from('rooms')
-        .update({ is_public: newVisibility })
-        .eq('id', roomId);
+        .update({ is_public: newVisibility } as any)
+        .eq('id', roomId as any);
       
       if (error) throw error;
       
