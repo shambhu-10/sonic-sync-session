@@ -28,6 +28,9 @@ const config = {
           primary: "hsl(var(--soundboard-primary))",
           secondary: "hsl(var(--soundboard-secondary))",
           accent: "hsl(var(--soundboard-accent))",
+          tertiary: "hsl(var(--soundboard-tertiary))", // Add this line to define soundboard-tertiary
+          light: "hsl(var(--soundboard-light))", // Add light variant
+          dark: "hsl(var(--soundboard-dark))", // Add dark variant
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
