@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const MainNav = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -90,6 +91,9 @@ const MainNav = () => {
           </div>
 
           <div className="hidden md:flex md:items-center md:space-x-2">
+            {/* Add theme toggle button */}
+            <ThemeToggle />
+            
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -137,7 +141,10 @@ const MainNav = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex md:hidden">
+          <div className="flex md:hidden items-center space-x-2">
+            {/* Add theme toggle to mobile view too */}
+            <ThemeToggle />
+            
             <button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-foreground focus:outline-none"

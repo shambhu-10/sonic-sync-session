@@ -72,11 +72,23 @@ const Dashboard = () => {
   // Create new room handler
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      toast.error("You must be logged in to create a room");
+      return;
+    }
     
     setIsSubmitting(true);
     
     try {
+      console.log("Creating room with params:", {
+        title: newRoomTitle,
+        description: newRoomDescription,
+        bpm: parseInt(newRoomBpm),
+        key_signature: newRoomKey,
+        host_id: user.id,
+        is_public: newRoomVisibility === "public"
+      });
+      
       const newRoom = await createRoom({
         title: newRoomTitle,
         description: newRoomDescription,
@@ -88,11 +100,20 @@ const Dashboard = () => {
       
       toast.success("Jam room created successfully!");
       setDialogOpen(false);
+      
+      // Reset form fields
+      setNewRoomTitle("");
+      setNewRoomDescription("");
+      setNewRoomBpm("120");
+      setNewRoomKey("C");
+      setNewRoomVisibility("public");
+      
+      // Navigate to the new room
       navigate(`/jam/${newRoom.id}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating room:", error);
       toast.error("Failed to create room", {
-        description: "Please try again later."
+        description: error.message || "Please try again later."
       });
     } finally {
       setIsSubmitting(false);
@@ -102,27 +123,37 @@ const Dashboard = () => {
   // Join room handler
   const handleJoinRoom = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !roomCode) return;
+    if (!user || !roomCode) {
+      toast.error("Please enter a room code and ensure you're logged in");
+      return;
+    }
     
     try {
       // Extract room ID from code or link
-      let roomId = roomCode;
+      let roomId = roomCode.trim();
       
       // Check if it's a URL and extract the ID
-      if (roomCode.includes("/jam/")) {
-        const parts = roomCode.split("/jam/");
+      if (roomId.includes("/jam/")) {
+        const parts = roomId.split("/jam/");
         roomId = parts[parts.length - 1];
       }
+      
+      console.log("Attempting to join room with ID:", roomId);
       
       // Attempt to join the room
       await joinRoom(roomId, user.id);
       
+      toast.success("Successfully joined the room!");
+      
+      // Reset form field
+      setRoomCode("");
+      
       // Redirect to the room
       navigate(`/jam/${roomId}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error joining room:", error);
       toast.error("Failed to join room", {
-        description: "Invalid room code or the room does not exist."
+        description: error.message || "Invalid room code or the room does not exist."
       });
     }
   };

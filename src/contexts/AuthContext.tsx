@@ -29,17 +29,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.id);
         setSession(currentSession);
         
         if (currentSession?.user) {
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', currentSession.user.id)
-            .single();
+          try {
+            const { data, error } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', currentSession.user.id)
+              .single();
 
-          if (!error && data) {
-            setUser(data as User);
+            if (!error && data) {
+              setUser(data as User);
+            } else if (error) {
+              console.error("Error fetching user profile:", error);
+            }
+          } catch (fetchError) {
+            console.error("Exception fetching user profile:", fetchError);
           }
         } else {
           setUser(null);
@@ -49,23 +56,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Then check for existing session
     const initializeAuth = async () => {
-      const { data: { session: initialSession } } = await supabase.auth.getSession();
-      
-      if (initialSession?.user) {
-        setSession(initialSession);
+      try {
+        console.log("Checking for existing session...");
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
         
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', initialSession.user.id)
-          .single();
+        if (initialSession?.user) {
+          console.log("Found existing session:", initialSession.user.id);
+          setSession(initialSession);
+          
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', initialSession.user.id)
+            .single();
 
-        if (!error && data) {
-          setUser(data as User);
+          if (!error && data) {
+            setUser(data as User);
+          } else {
+            console.error("Error fetching initial user profile:", error);
+          }
+        } else {
+          console.log("No existing session found");
         }
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
 
     initializeAuth();
