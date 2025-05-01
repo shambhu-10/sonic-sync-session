@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
@@ -16,7 +17,7 @@ import {
   ExternalLink 
 } from "lucide-react";
 import { toast } from "sonner";
-import { getRoom, getLoops, createLoop, createMixdown } from "@/services/api";
+import { getRoom, getLoops, createLoop, createMixdown, joinRoom } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Room, Loop, Mixdown } from "@/types";
 import RoomVisibilityToggle from "@/components/room/RoomVisibilityToggle";
@@ -56,16 +57,49 @@ const JamRoom = () => {
   } = useAudioRecorder(30); // 30 second max recording time
   
   const audioElements = useRef<{ [key: string]: HTMLAudioElement }>({});
+  const audioContextRef = useRef<AudioContext | null>(null);
   
+  // FIX 3: Prevent unwanted refreshes by ensuring effects don't run unnecessarily
+  // Added ref to track if initial data was loaded to prevent repeated fetches
+  const initialLoadRef = useRef(false);
+  
+  // FIX 2: Add a state to track if already attempted to join room
+  const [joinAttempted, setJoinAttempted] = useState(false);
+
   useEffect(() => {
     const fetchRoom = async () => {
-      if (!roomId) return;
+      if (!roomId || !user) return;
       
       try {
         setLoading(true);
-        const roomData = await getRoom(roomId);
-        setRoom(roomData);
-        fetchLoopsForRoom(roomId);
+        let roomData = null;
+        
+        try {
+          // FIX 2: First try to get room directly
+          roomData = await getRoom(roomId);
+        } catch (e) {
+          console.log("Error getting room directly, trying to join:", e);
+          
+          // If initial fetch fails and we haven't attempted joining yet, try joining the room
+          if (!joinAttempted) {
+            setJoinAttempted(true);
+            try {
+              // Try to join the room (will work for both public and private rooms with proper invite)
+              roomData = await joinRoom(roomId, user.id);
+              toast.success("Successfully joined the room!");
+            } catch (joinError) {
+              console.error("Failed to join room:", joinError);
+              throw new Error("Could not access this room. You may not have permission.");
+            }
+          } else {
+            throw e;
+          }
+        }
+        
+        if (roomData) {
+          setRoom(roomData);
+          await fetchLoopsForRoom(roomId);
+        }
       } catch (error) {
         console.error("Error fetching room:", error);
         setError("Failed to load jam room");
@@ -74,20 +108,36 @@ const JamRoom = () => {
         });
       } finally {
         setLoading(false);
+        // Mark initial load as complete
+        initialLoadRef.current = true;
       }
     };
     
     fetchRoom();
     
-    // Refresh the room data periodically
+    // FIX 3: Less frequent polling and prevent multiple active intervals
+    // Only refresh when visible and with longer interval
     const intervalId = setInterval(() => {
-      if (document.visibilityState === 'visible' && roomId) {
-        fetchRoom();
+      if (document.visibilityState === 'visible' && roomId && user && initialLoadRef.current) {
+        // Only refresh loops, not the entire room to minimize database calls
+        fetchLoopsForRoom(roomId);
       }
-    }, 30000);
+    }, 60000); // Reduced from 30s to 60s to reduce refresh frequency
     
-    return () => clearInterval(intervalId);
-  }, [roomId]);
+    return () => {
+      clearInterval(intervalId);
+      // Clean up all audio elements when component unmounts
+      Object.values(audioElements.current).forEach(audio => {
+        audio.pause();
+        audio.src = "";
+      });
+      
+      // Clean up audio context
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close();
+      }
+    };
+  }, [roomId, user, joinAttempted]); // Only re-run if these change
 
   // Fetch all loops for this room
   const fetchLoopsForRoom = async (roomId: string) => {
@@ -96,17 +146,26 @@ const JamRoom = () => {
     try {
       setFetchingLoops(true);
       const fetchedLoops = await getLoops(roomId);
-      setLoops(fetchedLoops);
       
-      // Initialize audio elements for each loop
-      fetchedLoops.forEach(loop => {
-        if (!audioElements.current[loop.id]) {
-          const audio = new Audio(loop.file_url);
-          audio.loop = true;
-          audio.volume = loop.volume / 100;
-          audioElements.current[loop.id] = audio;
-        }
-      });
+      // FIX 3: Compare loops before setting state to prevent unnecessary re-renders
+      const loopsChanged = JSON.stringify(fetchedLoops) !== JSON.stringify(loops);
+      
+      if (loopsChanged) {
+        setLoops(fetchedLoops);
+        
+        // Initialize audio elements for each loop
+        fetchedLoops.forEach(loop => {
+          if (!audioElements.current[loop.id]) {
+            const audio = new Audio(loop.file_url);
+            audio.loop = true;
+            audio.volume = loop.volume / 100;
+            
+            // Ensure audio element is correctly configured
+            audio.crossOrigin = "anonymous";
+            audioElements.current[loop.id] = audio;
+          }
+        });
+      }
     } catch (error) {
       console.error("Error fetching loops:", error);
       toast.error("Failed to load audio loops");
@@ -247,14 +306,16 @@ const JamRoom = () => {
     }
   };
 
-  // Export mixdown functionality
+  // FIX 1: Improved mixdown export functionality
   const handleExportMixdown = async () => {
     if (!user || !roomId) {
       toast.error("Cannot export mixdown - user or room information missing");
       return;
     }
     
-    if (loops.filter(loop => loop.is_active).length === 0) {
+    const activeLoops = loops.filter(loop => loop.is_active);
+    
+    if (activeLoops.length === 0) {
       toast.error("No active loops to export", {
         description: "Please enable at least one loop before exporting."
       });
@@ -263,42 +324,106 @@ const JamRoom = () => {
     
     try {
       setIsExporting(true);
+      setExportProgress(5);
       
-      // Show progress updates to user
-      let progressInterval = setInterval(() => {
-        setExportProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 200);
+      // Initialize audio context if not already done
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
       
-      // Create a simple audio context for mixing
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioContext = audioContextRef.current;
+      const offlineCtx = new OfflineAudioContext({
+        numberOfChannels: 2,
+        length: 44100 * 30, // 30 seconds at 44.1kHz
+        sampleRate: 44100,
+      });
       
-      // In production, we would load all active loops and mix them properly
-      // For this implementation, we'll create a placeholder audio blob
-      const activeLoops = loops.filter(loop => loop.is_active);
+      setExportProgress(15);
       
-      // Generate a temporary blob for mock export functionality
-      // In a real implementation, we would combine audio data from all active loops
-      const mockMixdownBlob = new Blob([new Uint8Array(10000)], { type: 'audio/webm' });
+      // Fetch all active audio files and decode them
+      const decodingPromises = activeLoops.map(async (loop) => {
+        try {
+          // Fetch the audio file
+          const response = await fetch(loop.file_url);
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await offlineCtx.decodeAudioData(arrayBuffer);
+          
+          return {
+            buffer: audioBuffer,
+            volume: loop.volume / 100
+          };
+        } catch (err) {
+          console.error(`Error loading audio for loop ${loop.name}:`, err);
+          return null;
+        }
+      });
+      
+      setExportProgress(35);
+      
+      const decodedAudios = (await Promise.all(decodingPromises)).filter(a => a !== null);
+      
+      if (decodedAudios.length === 0) {
+        throw new Error("Failed to load any audio files for mixing");
+      }
+      
+      setExportProgress(50);
+      
+      // Mix all audio sources together
+      decodedAudios.forEach(audio => {
+        if (!audio) return;
+        
+        const source = offlineCtx.createBufferSource();
+        source.buffer = audio.buffer;
+        
+        // Apply volume
+        const gainNode = offlineCtx.createGain();
+        gainNode.gain.value = audio.volume;
+        
+        // Connect nodes
+        source.connect(gainNode);
+        gainNode.connect(offlineCtx.destination);
+        
+        // Start playback (at time 0)
+        source.start();
+      });
+      
+      setExportProgress(65);
+      
+      // Render the audio
+      const renderedBuffer = await offlineCtx.startRendering();
+      
+      setExportProgress(80);
+      
+      // Convert the rendered buffer to a WAV file
+      const channelData = [];
+      for (let i = 0; i < renderedBuffer.numberOfChannels; i++) {
+        channelData.push(renderedBuffer.getChannelData(i));
+      }
+      
+      // Create WAV file
+      const wavData = createWavFile(channelData, renderedBuffer.sampleRate);
+      const mixdownBlob = new Blob([wavData], { type: 'audio/wav' });
+      
+      setExportProgress(90);
+      
+      // Generate filename
+      const timestamp = new Date().getTime();
+      const filename = `${room?.title.replace(/\s+/g, '-') || 'mixdown'}-${timestamp}.wav`;
       
       // Save the mixdown using the API
-      const mixdownData = {
+      const mixdownData: Partial<Mixdown> = {
         room_id: roomId,
         user_id: user.id,
       };
       
       // Call the API with the mixdown data
-      const mixdown = await createMixdown(
+      await createMixdown(
         mixdownData,
-        mockMixdownBlob
+        mixdownBlob
       );
       
-      clearInterval(progressInterval);
       setExportProgress(100);
       
       // Short pause at 100% before resetting
@@ -306,13 +431,15 @@ const JamRoom = () => {
         setIsExporting(false);
         setExportProgress(0);
         
-        // Provide download link with explicit download functionality
+        // Create direct browser download
+        const downloadUrl = URL.createObjectURL(mixdownBlob);
         const downloadLink = document.createElement('a');
-        downloadLink.href = mixdown.file_url;
-        downloadLink.download = `${room?.title.replace(/\s+/g, '-') || 'mixdown'}-${new Date().getTime()}.webm`;
+        downloadLink.href = downloadUrl;
+        downloadLink.download = filename;
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(downloadUrl); // Clean up URL object
         
         toast.success("Mixdown exported successfully", {
           description: "Your mixdown has been downloaded and saved to your profile."
@@ -321,9 +448,69 @@ const JamRoom = () => {
       
     } catch (error) {
       console.error("Error exporting mixdown:", error);
-      toast.error("Failed to export mixdown");
+      toast.error("Failed to export mixdown", {
+        description: error instanceof Error ? error.message : "Unknown error"
+      });
       setIsExporting(false);
       setExportProgress(0);
+    }
+  };
+  
+  // Helper function to create WAV file from PCM data
+  const createWavFile = (channelData: Float32Array[], sampleRate: number): ArrayBuffer => {
+    // Function to convert float audio data to 16-bit PCM
+    const floatTo16BitPCM = (output: DataView, offset: number, input: Float32Array): number => {
+      for (let i = 0; i < input.length; i++, offset += 2) {
+        const s = Math.max(-1, Math.min(1, input[i]));
+        output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+      return offset;
+    };
+
+    const numOfChan = channelData.length;
+    const length = channelData[0].length * numOfChan * 2; // 16-bit = 2 bytes
+    const buffer = new ArrayBuffer(44 + length);
+    const view = new DataView(buffer);
+
+    // RIFF chunk descriptor
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + length, true);
+    writeString(view, 8, 'WAVE');
+
+    // FMT sub-chunk
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true); // subchunk size
+    view.setUint16(20, 1, true); // PCM format
+    view.setUint16(22, numOfChan, true); // channels
+    view.setUint32(24, sampleRate, true); // sample rate
+    view.setUint32(28, sampleRate * numOfChan * 2, true); // byte rate
+    view.setUint16(32, numOfChan * 2, true); // block align
+    view.setUint16(34, 16, true); // bits per sample
+
+    // Data sub-chunk
+    writeString(view, 36, 'data');
+    view.setUint32(40, length, true);
+
+    // Interleave channel data
+    const interleaved = new Float32Array(channelData[0].length * numOfChan);
+    let offset = 0;
+    
+    for (let i = 0; i < channelData[0].length; i++) {
+      for (let j = 0; j < numOfChan; j++) {
+        interleaved[offset++] = channelData[j][i];
+      }
+    }
+    
+    // Write PCM data
+    floatTo16BitPCM(view, 44, interleaved);
+
+    return buffer;
+  };
+
+  // Helper function to write string to DataView
+  const writeString = (view: DataView, offset: number, string: string): void => {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
     }
   };
 
@@ -572,7 +759,7 @@ const JamRoom = () => {
                     </div>
                     <div className="flex justify-between">
                       <span>Format:</span>
-                      <span className="font-medium">WebM Audio</span>
+                      <span className="font-medium">WAV Audio</span>
                     </div>
                   </div>
                 </div>
@@ -580,7 +767,7 @@ const JamRoom = () => {
                 {isExporting && (
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm">Exporting mixdown...</span>
+                      <span className="text-sm">{exportProgress < 100 ? "Exporting mixdown..." : "Export complete!"}</span>
                       <span className="text-sm font-medium">{exportProgress}%</span>
                     </div>
                     <Progress value={exportProgress} className="w-full" />
@@ -594,7 +781,7 @@ const JamRoom = () => {
                     className="w-full"
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    {isExporting ? "Exporting..." : "Export Mixdown"}
+                    {isExporting ? "Exporting..." : "Export & Download Mixdown"}
                   </Button>
                   
                   <p className="text-xs text-center text-muted-foreground">
