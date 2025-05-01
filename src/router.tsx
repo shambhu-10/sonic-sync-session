@@ -23,12 +23,13 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
 import { AuthProvider } from "./contexts/AuthContext";
+import { Outlet } from "react-router-dom";
 
-// Define a layout component that wraps the AuthProvider around the actual content
-const AuthLayout = () => {
+// AuthWrapper component to provide authentication context
+const AuthWrapper = () => {
   return (
     <AuthProvider>
-      <NavWrapper />
+      <Outlet />
     </AuthProvider>
   );
 };
@@ -36,39 +37,44 @@ const AuthLayout = () => {
 // Define routes
 const routes: RouteObject[] = [
   {
-    path: "/",
-    element: <AuthLayout />,
+    element: <AuthWrapper />,
     children: [
-      { index: true, element: <Index /> },
-      { path: "auth", element: <Auth /> },
-      { path: "auth/callback", element: <AuthCallback /> },
-      // Protected routes
       {
-        element: <ProtectedRoute />,
+        path: "/",
+        element: <NavWrapper />,
         children: [
-          { path: "dashboard", element: <Dashboard /> },
-          { path: "room/:roomId", element: <JamRoom /> },
-          { path: "profile", element: <Profile /> },
+          { index: true, element: <Index /> },
+          { path: "auth", element: <Auth /> },
+          { path: "auth/callback", element: <AuthCallback /> },
+          // Protected routes
+          {
+            element: <ProtectedRoute />,
+            children: [
+              { path: "dashboard", element: <Dashboard /> },
+              { path: "room/:roomId", element: <JamRoom /> },
+              { path: "profile", element: <Profile /> },
+            ],
+          },
+          // Public routes for features
+          { path: "jam-rooms", element: <JamRooms /> },
+          { path: "live-collaboration", element: <LiveCollaboration /> },
+          { path: "loop-recording", element: <LoopRecording /> },
+          { path: "track-mixer", element: <TrackMixer /> },
+          { path: "export-mixdown", element: <ExportMixdown /> },
+          { path: "mobile-app", element: <MobileApp /> },
+          // Static pages
+          { path: "blogs", element: <Blogs /> },
+          { path: "contact", element: <Contact /> },
+          { path: "faqs", element: <Faqs /> },
+          { path: "pricing", element: <Pricing /> },
+          { path: "privacy", element: <Privacy /> },
+          { path: "terms", element: <Terms /> },
+          { path: "cookies", element: <Cookies /> },
+          // 404
+          { path: "404", element: <NotFound /> },
+          { path: "*", element: <Navigate to="/404" /> }
         ],
       },
-      // Public routes for features
-      { path: "jam-rooms", element: <JamRooms /> },
-      { path: "live-collaboration", element: <LiveCollaboration /> },
-      { path: "loop-recording", element: <LoopRecording /> },
-      { path: "track-mixer", element: <TrackMixer /> },
-      { path: "export-mixdown", element: <ExportMixdown /> },
-      { path: "mobile-app", element: <MobileApp /> },
-      // Static pages
-      { path: "blogs", element: <Blogs /> },
-      { path: "contact", element: <Contact /> },
-      { path: "faqs", element: <Faqs /> },
-      { path: "pricing", element: <Pricing /> },
-      { path: "privacy", element: <Privacy /> },
-      { path: "terms", element: <Terms /> },
-      { path: "cookies", element: <Cookies /> },
-      // 404
-      { path: "404", element: <NotFound /> },
-      { path: "*", element: <Navigate to="/404" /> }
     ],
   },
 ];
