@@ -2,17 +2,58 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { MusicIcon, Headphones, Users, Download, Star } from "lucide-react";
+import { MusicIcon, Headphones, Users, Download, Star, ArrowUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import WaveAnimation from "@/components/WaveAnimation";
+import { useState, useEffect } from "react";
+import ParticleNetworkAnimation from "@/components/ParticleNetworkAnimation";
 
 const Index = () => {
   const { user } = useAuth();
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  // Handle scroll for back-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.3,
+        delayChildren: 0.2
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        type: "spring", 
+        stiffness: 100,
+        damping: 10
+      }
+    }
+  };
 
   return (
     <div className="relative min-h-[calc(100vh-64px)] flex flex-col">
-      {/* Wave animation background instead of particles */}
-      <WaveAnimation />
+      {/* New particle network animation background */}
+      <ParticleNetworkAnimation />
       
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center text-center flex-grow relative z-10">
@@ -57,7 +98,7 @@ const Index = () => {
           >
             {user ? (
               <Button
-                className="bg-soundboard-accent hover:bg-soundboard-secondary text-lg px-8 py-6"
+                className="bg-soundboard-accent hover:bg-soundboard-secondary text-lg px-8 py-6 hover:scale-105 transition-transform"
                 asChild
               >
                 <Link to="/dashboard">Go to Dashboard</Link>
@@ -65,7 +106,7 @@ const Index = () => {
             ) : (
               <>
                 <Button
-                  className="bg-soundboard-accent hover:bg-soundboard-secondary text-lg px-8 py-6"
+                  className="bg-soundboard-accent hover:bg-soundboard-secondary text-lg px-8 py-6 hover:scale-105 transition-transform"
                   asChild
                 >
                   <Link to="/auth?tab=signup">Get Started</Link>
@@ -73,7 +114,7 @@ const Index = () => {
                 
                 <Button
                   variant="outline"
-                  className="border-soundboard-primary text-soundboard-primary hover:bg-soundboard-primary hover:text-white text-lg px-8 py-6"
+                  className="border-soundboard-primary text-soundboard-primary hover:bg-soundboard-primary hover:text-white text-lg px-8 py-6 hover:scale-105 transition-transform"
                   asChild
                 >
                   <Link to="/auth?tab=login">Sign In</Link>
@@ -85,7 +126,7 @@ const Index = () => {
       </div>
       
       {/* Features Section */}
-      <div className="bg-muted py-20">
+      <div className="bg-muted py-20" id="features">
         <div className="container mx-auto px-4">
           <motion.h2 
             className="text-3xl font-bold mb-12 text-center"
@@ -97,14 +138,17 @@ const Index = () => {
             Create Music Like Never Before
           </motion.h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
             {/* Feature 1 */}
             <motion.div 
-              className="bg-background p-6 rounded-lg shadow-md"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow hover:scale-[1.02] transition-all duration-300"
+              variants={itemVariants}
             >
               <h3 className="text-xl font-bold mb-3">Real-time Collaboration</h3>
               <p className="text-muted-foreground">
@@ -114,11 +158,8 @@ const Index = () => {
             
             {/* Feature 2 */}
             <motion.div 
-              className="bg-background p-6 rounded-lg shadow-md"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow hover:scale-[1.02] transition-all duration-300"
+              variants={itemVariants}
             >
               <h3 className="text-xl font-bold mb-3">High-Quality Recording</h3>
               <p className="text-muted-foreground">
@@ -128,23 +169,20 @@ const Index = () => {
             
             {/* Feature 3 */}
             <motion.div 
-              className="bg-background p-6 rounded-lg shadow-md"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow hover:scale-[1.02] transition-all duration-300"
+              variants={itemVariants}
             >
               <h3 className="text-xl font-bold mb-3">Export & Share</h3>
               <p className="text-muted-foreground">
                 Export your creations and share them with the world or keep them private.
               </p>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </div>
       
       {/* How It Works Section */}
-      <div className="py-20">
+      <div className="py-20" id="how-it-works">
         <div className="container mx-auto px-4">
           <motion.h2
             className="text-3xl font-bold mb-16 text-center"
@@ -156,17 +194,24 @@ const Index = () => {
             How It Works
           </motion.h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-10"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
             <motion.div
               className="flex flex-col items-center text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              variants={itemVariants}
             >
-              <div className="bg-soundboard-accent/10 p-6 rounded-full mb-6">
+              <motion.div 
+                className="bg-soundboard-accent/10 p-6 rounded-full mb-6"
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
                 <Headphones className="h-10 w-10 text-soundboard-accent" />
-              </div>
+              </motion.div>
               <h3 className="text-xl font-semibold mb-3">Create a Jam Room</h3>
               <p className="text-muted-foreground">
                 Start by creating a new room with your preferred BPM and key signature.
@@ -176,14 +221,15 @@ const Index = () => {
             
             <motion.div
               className="flex flex-col items-center text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              variants={itemVariants}
             >
-              <div className="bg-soundboard-accent/10 p-6 rounded-full mb-6">
+              <motion.div 
+                className="bg-soundboard-accent/10 p-6 rounded-full mb-6"
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
                 <Users className="h-10 w-10 text-soundboard-accent" />
-              </div>
+              </motion.div>
               <h3 className="text-xl font-semibold mb-3">Collaborate in Real-Time</h3>
               <p className="text-muted-foreground">
                 Record audio loops, adjust volumes, and mix tracks together.
@@ -193,21 +239,22 @@ const Index = () => {
             
             <motion.div
               className="flex flex-col items-center text-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.5 }}
+              variants={itemVariants}
             >
-              <div className="bg-soundboard-accent/10 p-6 rounded-full mb-6">
+              <motion.div 
+                className="bg-soundboard-accent/10 p-6 rounded-full mb-6"
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
                 <Download className="h-10 w-10 text-soundboard-accent" />
-              </div>
+              </motion.div>
               <h3 className="text-xl font-semibold mb-3">Export & Share</h3>
               <p className="text-muted-foreground">
                 When your masterpiece is complete, export it and share it with others.
                 Download high-quality audio files for your portfolio.
               </p>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </div>
       
@@ -224,7 +271,13 @@ const Index = () => {
             What Musicians Are Saying
           </motion.h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
             {[
               {
                 name: "Alex Johnson",
@@ -244,11 +297,8 @@ const Index = () => {
             ].map((testimonial, index) => (
               <motion.div
                 key={index}
-                className="bg-background p-6 rounded-lg shadow-md"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 * index }}
+                className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                variants={itemVariants}
               >
                 <div className="flex items-center mb-4">
                   <div className="flex-shrink-0">
@@ -269,7 +319,7 @@ const Index = () => {
                 <p className="text-muted-foreground italic">"{testimonial.quote}"</p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
       
@@ -288,7 +338,7 @@ const Index = () => {
               Join thousands of musicians creating, collaborating, and sharing their music with the world.
             </p>
             <Button
-              className="bg-soundboard-accent hover:bg-soundboard-secondary text-white text-lg px-10 py-6"
+              className="bg-soundboard-accent hover:bg-soundboard-secondary text-white text-lg px-10 py-6 hover:scale-105 transition-transform"
               asChild
             >
               <Link to="/auth?tab=signup">Start Creating Now</Link>
@@ -296,6 +346,19 @@ const Index = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Back to top button */}
+      {showBackToTop && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="fixed bottom-8 right-8 bg-soundboard-accent hover:bg-soundboard-secondary text-white p-3 rounded-full shadow-lg z-50 hover:scale-110 transition-transform"
+          onClick={scrollToTop}
+        >
+          <ArrowUp className="h-6 w-6" />
+        </motion.button>
+      )}
     </div>
   );
 };

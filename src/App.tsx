@@ -1,94 +1,146 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import MainNav from "./components/MainNav";
-import NavWrapper from "./components/NavWrapper";
-import Footer from "./components/Footer";
+import { useState, useEffect } from "react";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
 import JamRoom from "./pages/JamRoom";
-import Profile from "./pages/Profile";
-import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { AnimatePresence } from "framer-motion";
-import Faqs from "./pages/Faqs";
+import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import Pricing from "./pages/Pricing";
 import Blogs from "./pages/Blogs";
+import Faqs from "./pages/Faqs";
 import Contact from "./pages/Contact";
-import BackgroundMusic from "./components/BackgroundMusic";
-import { useEffect } from "react";
+import Profile from "./pages/Profile";
+import NotFound from "./pages/NotFound";
+import NavWrapper from "./components/NavWrapper";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-// Create query client instance outside of the component
-const queryClient = new QueryClient();
+// Content pages for footer links
+import JamRooms from "./pages/JamRooms";
+import LiveCollaboration from "./pages/LiveCollaboration";
+import LoopRecording from "./pages/LoopRecording";
+import TrackMixer from "./pages/TrackMixer";
+import ExportMixdown from "./pages/ExportMixdown";
+import MobileApp from "./pages/MobileApp";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Cookies from "./pages/Cookies";
 
-// This component wraps our routes to ensure the ScrollToTop behavior and
-// that AnimatePresence works with location changes
-const AppRoutes = () => {
-  const location = useLocation();
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "sonner";
+
+const App = () => {
+  const [mounted, setMounted] = useState(false);
   
-  // Scroll to top when location changes
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
+    setMounted(true);
+  }, []);
   
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <NavWrapper />,
+      errorElement: <NotFound />,
+      children: [
+        {
+          index: true,
+          element: <Index />,
+        },
+        {
+          path: "auth",
+          element: <Auth />,
+        },
+        {
+          path: "auth/callback",
+          element: <AuthCallback />,
+        },
+        {
+          path: "pricing",
+          element: <Pricing />,
+        },
+        {
+          path: "blogs",
+          element: <Blogs />,
+        },
+        {
+          path: "faqs",
+          element: <Faqs />,
+        },
+        {
+          path: "contact",
+          element: <Contact />,
+        },
+        // New footer content pages
+        {
+          path: "jam-rooms",
+          element: <JamRooms />,
+        },
+        {
+          path: "live-collaboration",
+          element: <LiveCollaboration />,
+        },
+        {
+          path: "loop-recording",
+          element: <LoopRecording />,
+        },
+        {
+          path: "track-mixer",
+          element: <TrackMixer />,
+        },
+        {
+          path: "export-mixdown",
+          element: <ExportMixdown />,
+        },
+        {
+          path: "mobile-app",
+          element: <MobileApp />,
+        },
+        {
+          path: "privacy",
+          element: <Privacy />,
+        },
+        {
+          path: "terms",
+          element: <Terms />,
+        },
+        {
+          path: "cookies",
+          element: <Cookies />,
+        },
+        {
+          element: <ProtectedRoute />,
+          children: [
+            {
+              path: "dashboard",
+              element: <Dashboard />,
+            },
+            {
+              path: "jam/:roomId?",
+              element: <JamRoom />,
+            },
+            {
+              path: "profile",
+              element: <Profile />,
+            },
+          ],
+        },
+      ],
+    },
+  ]);
+
+  if (!mounted) return null;
+
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <Routes location={location} key={location.pathname}>
-        {/* Public Routes */}
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/faqs" element={<Faqs />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/blogs" element={<Blogs />} />
-        <Route path="/contact" element={<Contact />} />
-        
-        {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/jam/:roomId" element={<JamRoom />} />
-          <Route path="/profile" element={<Profile />} />
-        </Route>
-        
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </AnimatePresence>
+    <ThemeProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+        <SonnerToaster position="top-center" expand={true} richColors />
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
-
-// Define App component as a proper function component
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <ThemeProvider>
-            <TooltipProvider>
-              <NavWrapper>
-                <Toaster />
-                <Sonner />
-                <div className="flex flex-col min-h-screen">
-                  <MainNav />
-                  <BackgroundMusic />
-                  <div className="flex-grow">
-                    <AppRoutes />
-                  </div>
-                  <Footer />
-                </div>
-              </NavWrapper>
-            </TooltipProvider>
-          </ThemeProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-}
 
 export default App;
