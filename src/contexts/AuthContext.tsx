@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/types";
 import { toast } from "sonner";
-import { Session as SupabaseSession } from "@supabase/supabase-js";
+import { Session as SupabaseSession, AuthChangeEvent } from "@supabase/supabase-js";
 
 // Using our custom User type but Supabase's Session type structure
 interface AuthContextType {
@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
+      async (event: AuthChangeEvent, currentSession) => {
         console.log("Auth state changed:", event, currentSession?.user?.id);
         setSession(currentSession);
         
@@ -38,8 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Show success message for sign in and sign up events
           if (event === 'SIGNED_IN') {
             toast.success("Signed in successfully! Welcome back!");
-          } else if (event === 'SIGNED_UP') {
-            toast.success("Account created successfully! Welcome to SoundBoard!");
+          } else if (event === 'USER_UPDATED') {
+            // This event can sometimes be triggered after a successful signup
+            if (!session) {
+              toast.success("Account created successfully! Welcome to SoundBoard!");
+            }
           }
           
           // Use setTimeout to avoid potential deadlocks with Supabase client
