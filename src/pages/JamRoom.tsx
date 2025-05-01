@@ -1,11 +1,12 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ExitIcon, Settings } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { toast } from "sonner";
-import { getRoomById } from "@/services/api";
+import { getRoom } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Room } from "@/types";
 import RoomVisibilityToggle from "@/components/room/RoomVisibilityToggle";
@@ -25,7 +26,7 @@ const JamRoom = () => {
       
       try {
         setLoading(true);
-        const roomData = await getRoomById(roomId);
+        const roomData = await getRoom(roomId);
         setRoom(roomData);
       } catch (error) {
         console.error("Error fetching room:", error);
@@ -109,7 +110,7 @@ const JamRoom = () => {
             onClick={handleExitRoom}
             className="flex items-center"
           >
-            <ExitIcon className="mr-2 h-4 w-4" />
+            <LogOut className="mr-2 h-4 w-4" />
             Exit Room
           </Button>
         </div>
