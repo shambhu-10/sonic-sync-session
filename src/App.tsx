@@ -8,7 +8,7 @@ function App() {
   return (
     <ThemeProvider>
       <RouterProvider router={router} />
-      <Toaster />
+      <Toaster position="top-center" closeButton richColors />
     </ThemeProvider>
   );
 }

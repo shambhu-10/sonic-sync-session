@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Save session immediately to prevent loss
         setSession(data.session);
         setUser(data.user as any);
-        toast.success("Sign in successful! Welcome back!");
+        toast.success("Signed in successfully! Welcome back!");
         navigate("/dashboard");
       }
     } catch (error: any) {
@@ -147,12 +147,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       
-      // Check if email is already in use
-      const { error: emailCheckError } = await supabase
-        .auth.signInWithPassword({ email, password: "some-random-password-to-check" });
+      // Check if email is already in use by checking auth.users
+      const { error: emailExistsError } = await supabase.auth
+        .signInWithPassword({ email, password: "dummy-password-to-check-existence" });
       
-      // If no error when trying wrong password, email exists
-      if (!emailCheckError || (emailCheckError && emailCheckError.message.includes("Invalid login credentials"))) {
+      // If error doesn't include "Invalid login credentials", the email might be in use
+      if (!emailExistsError || (emailExistsError && !emailExistsError.message.includes("Invalid login credentials"))) {
         toast.error("Account creation failed", {
           description: "Email address is already registered. Please sign in instead."
         });
@@ -176,9 +176,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // If auto-confirmed, sign in right away
         setSession(data.session);
         navigate("/dashboard");
-        toast.success("Sign up successful! Welcome to SoundBoard!");
+        toast.success("Account created successfully! Welcome to SoundBoard!");
       } else {
-        toast.success("Sign up successful!", {
+        toast.success("Account created successfully!", {
           description: "Please check your email to confirm your account."
         });
       }

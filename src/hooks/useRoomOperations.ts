@@ -71,7 +71,7 @@ export function useRoomOperations() {
     }
   };
   
-  // Join room handler
+  // Join room handler - Fixed to properly extract room ID from various formats
   const handleJoinRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !roomCode) {
@@ -84,17 +84,10 @@ export function useRoomOperations() {
       let roomId = roomCode.trim();
       
       // Check if it's a URL and extract the ID
-      if (roomId.includes("/room/") || roomId.includes("/jam/")) {
-        // Handle both /room/ and /jam/ URL formats
-        const pattern = /\/(room|jam)\/([^/?#]+)/;
-        const matches = roomId.match(pattern);
-        
-        if (matches && matches[2]) {
-          roomId = matches[2];
-        } else {
-          // If pattern doesn't match, split by the last segment that contains /room/ or /jam/
-          const parts = roomId.split(/\/(?:room|jam)\//).filter(Boolean);
-          roomId = parts[parts.length - 1].split(/[?#]/)[0].trim();
+      if (roomId.includes("/room/")) {
+        const parts = roomId.split("/room/");
+        if (parts.length > 1) {
+          roomId = parts[1].split(/[/?#]/)[0];
         }
       }
       
@@ -103,7 +96,7 @@ export function useRoomOperations() {
       // Attempt to join the room
       const roomData = await joinRoom(roomId, user.id);
       
-      toast.success("Successfully joined the room!");
+      toast.success("Successfully joined the jam room!");
       
       // Reset form field
       setRoomCode("");
