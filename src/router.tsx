@@ -22,12 +22,22 @@ import Pricing from "./pages/Pricing";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
+import { AuthProvider } from "./contexts/AuthContext";
+
+// Define a layout component that wraps the AuthProvider around the actual content
+const AuthLayout = () => {
+  return (
+    <AuthProvider>
+      <NavWrapper />
+    </AuthProvider>
+  );
+};
 
 // Define routes
 const routes: RouteObject[] = [
   {
     path: "/",
-    element: <NavWrapper />,
+    element: <AuthLayout />,
     children: [
       { index: true, element: <Index /> },
       { path: "auth", element: <Auth /> },
