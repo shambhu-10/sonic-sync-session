@@ -2,6 +2,8 @@
 import { ReactNode, useEffect } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Outlet } from "react-router-dom";
+import MainNav from "./MainNav";
+import Footer from "./Footer";
 
 interface NavWrapperProps {
   children?: ReactNode;
@@ -56,9 +58,13 @@ const NavWrapper = ({ children }: NavWrapperProps) => {
   }, []);
 
   return (
-    <>
-      {children || <Outlet />}
-    </>
+    <div className="flex flex-col min-h-screen">
+      <MainNav />
+      <main className="flex-1">
+        {children || <Outlet />}
+      </main>
+      <Footer />
+    </div>
   );
 };
 

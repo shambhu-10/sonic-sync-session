@@ -1,144 +1,298 @@
 
 import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { ArrowUp, FileText, Scale, AlertTriangle, BookOpen, MessageSquare } from "lucide-react";
+import { useState, useEffect } from "react";
+import useAnimatedVariants from "@/hooks/useAnimatedVariants";
 
 const Terms = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
-  
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { type: "spring", stiffness: 50 }
-    }
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const { containerVariants, itemVariants } = useAnimatedVariants();
+
+  // Handle scroll for back-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="container mx-auto px-4 py-16">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="text-center mb-12"
       >
-        <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Effective Date: May 1, 2025
+        <div className="inline-flex items-center justify-center p-4 bg-soundboard-accent/10 rounded-full mb-4">
+          <Scale className="h-8 w-8 text-soundboard-accent" />
+        </div>
+        <h1 className="text-4xl font-bold mb-6">Terms of Service</h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          By using SoundBoard, you agree to these terms that outline your rights and responsibilities.
         </p>
       </motion.div>
 
-      <motion.div 
-        className="max-w-4xl mx-auto prose prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.div variants={itemVariants}>
-          <h2>1. Agreement to Terms</h2>
-          <p>
-            By accessing or using SoundBoard's website and services (collectively, the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you don't agree to these Terms, you may not access or use the Service.
-          </p>
-        </motion.div>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16">
+        {/* Sidebar with quick links */}
+        <motion.aside 
+          className="md:col-span-3 lg:col-span-2"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <div className="md:sticky md:top-24 space-y-2">
+            <h3 className="font-semibold mb-3">Quick Links</h3>
+            {[
+              { label: "Agreement", href: "#agreement" },
+              { label: "Using Our Service", href: "#using-service" },
+              { label: "Account Terms", href: "#account-terms" },
+              { label: "Content & Copyright", href: "#content" },
+              { label: "Limitations", href: "#limitations" },
+              { label: "Termination", href: "#termination" },
+              { label: "Pricing & Payments", href: "#payments" },
+              { label: "Changes to Terms", href: "#changes" },
+              { label: "Contact Information", href: "#contact" }
+            ].map((link, index) => (
+              <motion.div key={index} variants={itemVariants}>
+                <a 
+                  href={link.href}
+                  className="block text-sm py-2 px-3 text-muted-foreground hover:text-soundboard-accent hover:bg-soundboard-accent/5 rounded-md transition-colors"
+                >
+                  {link.label}
+                </a>
+              </motion.div>
+            ))}
+          </div>
+        </motion.aside>
 
-        <motion.div variants={itemVariants}>
-          <h2>2. Changes to Terms</h2>
-          <p>
-            We may modify the Terms at any time. If we make changes, we will provide notice of such changes, such as by sending an email notification, providing notice through the Service, or updating the "Effective Date" at the top of these Terms. Your continued use of the Service following notification of changes will constitute your acceptance of such changes.
-          </p>
-        </motion.div>
+        {/* Main content */}
+        <div className="md:col-span-9 lg:col-span-10">
+          <Card>
+            <CardContent className="pt-6 prose dark:prose-invert max-w-none">
+              <motion.section 
+                id="agreement"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex items-center mb-4">
+                  <FileText className="h-5 w-5 text-soundboard-accent mr-2" />
+                  <h2 className="text-2xl font-bold">1. Terms of Agreement</h2>
+                </div>
+                <p>
+                  Last Updated: May 1, 2023
+                </p>
+                <p>
+                  These Terms of Service ("Terms") constitute a legally binding agreement between you and SoundBoard ("we", "us", "our") governing your access to and use of the SoundBoard website, applications, and services (collectively, the "Service").
+                </p>
+                <p>
+                  By accessing or using the Service, you agree to be bound by these Terms. If you do not agree to these Terms, you may not access or use the Service.
+                </p>
+              </motion.section>
 
-        <motion.div variants={itemVariants}>
-          <h2>3. Using the Service</h2>
-          <p><strong>Eligibility</strong>: You must be at least 13 years of age to use the Service.</p>
-          <p><strong>Registration and Account</strong>: To access certain features of the Service, you must register for an account. You agree to provide accurate, current, and complete information during registration and to update such information to keep it accurate, current, and complete.</p>
-          <p><strong>Account Security</strong>: You are responsible for safeguarding your password and for any activities or actions under your account. You agree to notify us immediately of any unauthorized use of your account.</p>
-          <p><strong>Acceptable Use</strong>: You agree not to use the Service to:</p>
-          <ul>
-            <li>Violate any applicable law or regulation</li>
-            <li>Infringe the intellectual property rights of others</li>
-            <li>Upload or transmit malware or other harmful code</li>
-            <li>Interfere with or disrupt the integrity or performance of the Service</li>
-            <li>Harass, abuse, or harm another person</li>
-            <li>Send unsolicited communications, promotions, or advertisements</li>
-            <li>Attempt to gain unauthorized access to the Service or related systems or networks</li>
-          </ul>
-        </motion.div>
+              <Separator className="my-8" />
 
-        <motion.div variants={itemVariants}>
-          <h2>4. Content and Intellectual Property Rights</h2>
-          <p><strong>User Content</strong>: The Service allows you to upload, store, and share content such as audio recordings, text, and other materials ("User Content"). You retain ownership of your User Content.</p>
-          <p><strong>License to User Content</strong>: By uploading User Content to the Service, you grant SoundBoard a non-exclusive, transferable, sub-licensable, royalty-free, worldwide license to use, copy, modify, create derivative works based on, distribute, publicly display, and publicly perform your User Content in connection with operating and providing the Service.</p>
-          <p><strong>Content Restrictions</strong>: You may not upload User Content that:</p>
-          <ul>
-            <li>Infringes any third party's intellectual property or other rights</li>
-            <li>Violates any law or regulation</li>
-            <li>Is harmful, abusive, obscene, or otherwise objectionable</li>
-            <li>Contains personal information of third parties without their consent</li>
-          </ul>
-          <p><strong>Content Removal</strong>: We reserve the right to remove any User Content for any reason without prior notice.</p>
-        </motion.div>
+              <motion.section 
+                id="using-service"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex items-center mb-4">
+                  <BookOpen className="h-5 w-5 text-soundboard-accent mr-2" />
+                  <h2 className="text-2xl font-bold">2. Using Our Service</h2>
+                </div>
+                <p>
+                  SoundBoard provides a platform for musicians to collaborate, record, and share audio content online. You are responsible for your use of the Service and for any content you provide, including compliance with applicable laws, rules, and regulations.
+                </p>
 
-        <motion.div variants={itemVariants}>
-          <h2>5. Copyright Policy</h2>
-          <p>
-            We respect the intellectual property rights of others and expect our users to do the same. We respond to notices of alleged copyright infringement according to the Digital Millennium Copyright Act (DMCA).
-          </p>
-        </motion.div>
+                <h3 className="text-xl font-semibold mt-6 mb-3">Eligibility</h3>
+                <p>
+                  To use the Service, you must be at least 13 years old. If you are under 18, you must have permission from a parent or legal guardian.
+                </p>
 
-        <motion.div variants={itemVariants}>
-          <h2>6. Privacy</h2>
-          <p>
-            Your use of the Service is also subject to our Privacy Policy, which describes how we collect, use, and share your personal information.
-          </p>
-        </motion.div>
+                <h3 className="text-xl font-semibold mt-6 mb-3">Service Changes</h3>
+                <p>
+                  We reserve the right to modify or discontinue, temporarily or permanently, the Service (or any part thereof) with or without notice. We shall not be liable to you or to any third party for any modification, suspension, or discontinuance of the Service.
+                </p>
+              </motion.section>
 
-        <motion.div variants={itemVariants}>
-          <h2>7. Termination</h2>
-          <p>
-            We may terminate or suspend your account and access to the Service at any time, without prior notice or liability, for any reason, including if you breach the Terms.
-          </p>
-        </motion.div>
+              <Separator className="my-8" />
 
-        <motion.div variants={itemVariants}>
-          <h2>8. Disclaimers</h2>
-          <p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
-        </motion.div>
+              <motion.section 
+                id="account-terms"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex items-center mb-4">
+                  <MessageSquare className="h-5 w-5 text-soundboard-accent mr-2" />
+                  <h2 className="text-2xl font-bold">3. Account Terms</h2>
+                </div>
+                <p>
+                  When you create an account with us, you must provide accurate, complete, and current information. You are responsible for safeguarding your password and for all activities that occur under your account.
+                </p>
+                <p className="mt-4">
+                  You agree not to:
+                </p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Share your account with anyone else</li>
+                  <li>Create more than one account per person</li>
+                  <li>Create an account for someone other than yourself</li>
+                  <li>Use another user's account without permission</li>
+                  <li>Provide false or misleading information when registering</li>
+                </ul>
+                
+                <p className="mt-4">
+                  We reserve the right to suspend or terminate your account if any of these conditions are violated.
+                </p>
+              </motion.section>
 
-        <motion.div variants={itemVariants}>
-          <h2>9. Limitation of Liability</h2>
-          <p>
-            IN NO EVENT WILL WE BE LIABLE FOR ANY INDIRECT, SPECIAL, INCIDENTAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOSS OF PROFITS, DATA, USE, OR GOODWILL, ARISING OUT OF OR IN CONNECTION WITH THESE TERMS OR THE SERVICE.
-          </p>
-        </motion.div>
+              <Separator className="my-8" />
 
-        <motion.div variants={itemVariants}>
-          <h2>10. Governing Law</h2>
-          <p>
-            These Terms shall be governed by the laws of the State of California, without respect to its conflict of laws principles.
-          </p>
-        </motion.div>
+              <motion.section 
+                id="content"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-2xl font-bold mb-4">4. Content & Copyright</h2>
+                <p>
+                  You retain ownership rights to any content you upload to the Service. However, by uploading content, you grant SoundBoard a worldwide, non-exclusive, royalty-free license to use, reproduce, process, adapt, modify, publish, transmit, and display that content for the purpose of providing the Service.
+                </p>
+                <p className="mt-4">
+                  You represent and warrant that:
+                </p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>You own or have the right to use and authorize SoundBoard to use your content</li>
+                  <li>Your content does not violate any copyright, trademark, or other intellectual property rights</li>
+                  <li>Your content does not violate any third-party rights or applicable laws</li>
+                </ul>
+              </motion.section>
 
-        <motion.div variants={itemVariants}>
-          <h2>11. Contact Information</h2>
-          <p>
-            If you have any questions about these Terms, please contact us at:
-          </p>
-          <p className="mb-8">
-            SoundBoard<br />
-            Email: terms@soundboard.app<br />
-            Address: 123 Music Lane, Studio City, CA 91604
-          </p>
-        </motion.div>
-      </motion.div>
+              {/* Additional sections would continue here */}
+              <Separator className="my-8" />
+
+              <motion.section 
+                id="limitations"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex items-center mb-4">
+                  <AlertTriangle className="h-5 w-5 text-soundboard-accent mr-2" />
+                  <h2 className="text-2xl font-bold">5. Limitations & Restrictions</h2>
+                </div>
+                <p>
+                  When using our Service, you agree not to:
+                </p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Violate any laws or regulations</li>
+                  <li>Infringe upon the rights of others</li>
+                  <li>Distribute malware or other harmful content</li>
+                  <li>Attempt to gain unauthorized access to the Service</li>
+                  <li>Use the Service for unauthorized commercial purposes</li>
+                  <li>Harass, abuse, or harm another person</li>
+                  <li>Interfere with or disrupt the Service</li>
+                </ul>
+              </motion.section>
+
+              <Separator className="my-8" />
+
+              <motion.section 
+                id="termination"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-2xl font-bold mb-4">6. Termination</h2>
+                <p>
+                  We may terminate or suspend your access to the Service immediately, without prior notice or liability, for any reason, including if you breach these Terms.
+                </p>
+                <p className="mt-4">
+                  Upon termination, your right to use the Service will immediately cease. If you wish to terminate your account, you may simply discontinue using the Service or contact us to request account deletion.
+                </p>
+              </motion.section>
+
+              <Separator className="my-8" />
+
+              <motion.section 
+                id="payments"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-2xl font-bold mb-4">7. Pricing & Payments</h2>
+                <p>
+                  Some aspects of the Service may be offered for a fee. You agree to pay all applicable fees and taxes associated with your use of such features.
+                </p>
+                <p className="mt-4">
+                  Payment terms will be specified at the time you sign up for a paid feature or plan. Failure to make timely payments may result in suspension or termination of your access to paid features.
+                </p>
+              </motion.section>
+
+              <Separator className="my-8" />
+
+              <motion.section 
+                id="changes"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-2xl font-bold mb-4">8. Changes to Terms</h2>
+                <p>
+                  We reserve the right to update or change these Terms at any time. We will provide notice of significant changes by posting the new Terms on the Service and updating the "Last Updated" date.
+                </p>
+                <p className="mt-4">
+                  Your continued use of the Service after such modifications constitutes your acceptance of the revised Terms.
+                </p>
+              </motion.section>
+
+              <Separator className="my-8" />
+
+              <motion.section 
+                id="contact"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-2xl font-bold mb-4">9. Contact Information</h2>
+                <p>
+                  If you have any questions about these Terms, please contact us at:
+                </p>
+                <p className="mt-4">
+                  <strong>Email:</strong> legal@soundboard.app
+                </p>
+                <p>
+                  <strong>Address:</strong> 123 Music Avenue, Suite 456, Audioville, CA 94123, USA
+                </p>
+              </motion.section>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Back to top button */}
+      {showBackToTop && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="fixed bottom-8 right-8 bg-soundboard-accent hover:bg-soundboard-secondary text-white p-3 rounded-full shadow-lg z-50 hover:scale-110 transition-transform"
+          onClick={scrollToTop}
+        >
+          <ArrowUp className="h-6 w-6" />
+        </motion.button>
+      )}
     </div>
   );
 };

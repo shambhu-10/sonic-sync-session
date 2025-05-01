@@ -2,10 +2,48 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { 
+  Download, FileAudio, Settings, Music, Zap, 
+  Link as LinkIcon, Share2, Check, File, FileJson 
+} from "lucide-react";
+import useAnimatedVariants from "@/hooks/useAnimatedVariants";
 import { Link } from "react-router-dom";
-import { Download, Share2, FileAudio } from "lucide-react";
 
 const ExportMixdown = () => {
+  const { containerVariants, itemVariants } = useAnimatedVariants();
+
+  // File format options
+  const fileFormats = [
+    { 
+      name: "WAV", 
+      description: "Uncompressed high-quality audio",
+      quality: "Lossless",
+      size: "Large",
+      compatibility: "DAWs, Professional Use"
+    },
+    { 
+      name: "MP3", 
+      description: "Compressed standard format",
+      quality: "Good (Lossy)",
+      size: "Small",
+      compatibility: "Universal" 
+    },
+    { 
+      name: "AAC", 
+      description: "Advanced audio compression",
+      quality: "Better than MP3 (Lossy)",
+      size: "Small",
+      compatibility: "Apple devices, Streaming" 
+    },
+    { 
+      name: "FLAC", 
+      description: "Lossless audio compression",
+      quality: "Lossless",
+      size: "Medium",
+      compatibility: "Audiophile, Archiving" 
+    }
+  ];
+
   return (
     <div className="container mx-auto px-4 py-16">
       <motion.div
@@ -18,163 +56,232 @@ const ExportMixdown = () => {
           Export Mixdown
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Export high-quality audio of your complete mix to share with the world or use in your productions.
+          Convert your collaborative sessions into professional-quality audio files ready for sharing, mastering, or publishing.
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-24">
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <h2 className="text-3xl font-bold mb-6">Professional Audio Export</h2>
-          <p className="text-lg text-muted-foreground mb-6">
-            Get studio-quality audio exports of your jam sessions and collaborations with just a few clicks.
-          </p>
-          <ul className="space-y-4 mb-8">
-            <li className="flex items-start">
-              <span className="bg-soundboard-accent/10 p-1 rounded-full mr-3 mt-1">
-                <FileAudio className="h-4 w-4 text-soundboard-accent" />
-              </span>
-              <span>High-quality WAV, MP3, and FLAC formats</span>
-            </li>
-            <li className="flex items-start">
-              <span className="bg-soundboard-accent/10 p-1 rounded-full mr-3 mt-1">
-                <Download className="h-4 w-4 text-soundboard-accent" />
-              </span>
-              <span>Export individual tracks or the complete mix</span>
-            </li>
-            <li className="flex items-start">
-              <span className="bg-soundboard-accent/10 p-1 rounded-full mr-3 mt-1">
-                <Share2 className="h-4 w-4 text-soundboard-accent" />
-              </span>
-              <span>Share directly to social platforms or download to your device</span>
-            </li>
-          </ul>
-          <Button
-            className="bg-soundboard-accent hover:bg-soundboard-secondary hover:scale-105 transition-transform"
-            asChild
-          >
-            <Link to="/dashboard">Create & Export</Link>
-          </Button>
-        </motion.div>
+      {/* Export Options Section */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="mb-16"
+      >
+        <h2 className="text-2xl font-semibold text-center mb-8">Export Options</h2>
         
-        <motion.div
-          className="relative h-80 rounded-xl overflow-hidden border border-border bg-gradient-to-br from-background to-soundboard-accent/5"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          {/* Export mockup UI */}
-          <div className="absolute inset-0 flex flex-col p-6">
-            <div className="mb-8">
-              <h3 className="font-semibold mb-2">Export Settings</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-background/80 p-3 rounded-md">
-                  <div className="text-xs text-muted-foreground">Format</div>
-                  <div className="font-medium">WAV (Lossless)</div>
-                </div>
-                <div className="bg-background/80 p-3 rounded-md">
-                  <div className="text-xs text-muted-foreground">Quality</div>
-                  <div className="font-medium">24-bit / 48kHz</div>
-                </div>
-                <div className="bg-background/80 p-3 rounded-md">
-                  <div className="text-xs text-muted-foreground">Channels</div>
-                  <div className="font-medium">Stereo</div>
-                </div>
-                <div className="bg-background/80 p-3 rounded-md">
-                  <div className="text-xs text-muted-foreground">Duration</div>
-                  <div className="font-medium">3:42</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 flex flex-col justify-end">
-              <div className="bg-background/80 p-4 rounded-md mb-4">
-                <div className="mb-2">
-                  <div className="text-xs text-muted-foreground">File Name</div>
-                  <div className="font-medium">My_Awesome_Jam_Final_Mix.wav</div>
-                </div>
-                <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
-                  <motion.div 
-                    className="bg-soundboard-accent h-full" 
-                    initial={{ width: "0%" }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  />
-                </div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-xs">Processing...</span>
-                  <span className="text-xs">65%</span>
-                </div>
-              </div>
-              
-              <div className="flex justify-center">
-                <Button 
-                  className="bg-soundboard-accent hover:bg-soundboard-secondary"
-                  size="lg"
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Left side - File formats */}
+          <div>
+            <h3 className="text-xl font-medium mb-6 flex items-center">
+              <FileAudio className="mr-2 h-5 w-5 text-soundboard-accent" />
+              Available File Formats
+            </h3>
+            
+            <div className="space-y-4">
+              {fileFormats.map((format, index) => (
+                <motion.div
+                  key={index}
+                  className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
                 >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Mix
-                </Button>
-              </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-semibold text-lg">{format.name}</h4>
+                    <span className="text-xs py-1 px-2.5 rounded-full bg-soundboard-accent/10 text-soundboard-accent font-medium">
+                      {format.quality}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground text-sm mb-3">{format.description}</p>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="font-medium">File Size:</span> {format.size}
+                    </div>
+                    <div>
+                      <span className="font-medium">Best for:</span> {format.compatibility}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
-        </motion.div>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.6 }}
-        className="text-center mb-16"
-      >
-        <h2 className="text-3xl font-bold mb-8">Export Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Card className="hover:shadow-lg transition-all duration-300 hover:translate-y-[-5px]">
-            <CardContent className="pt-6">
-              <h3 className="text-xl font-semibold mb-4">Multiple Formats</h3>
-              <p className="text-muted-foreground">
-                Choose from WAV for maximum quality, MP3 for smaller file sizes, or FLAC for the best of both worlds.
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="hover:shadow-lg transition-all duration-300 hover:translate-y-[-5px]">
-            <CardContent className="pt-6">
-              <h3 className="text-xl font-semibold mb-4">Batch Export</h3>
-              <p className="text-muted-foreground">
-                Export multiple jams or individual tracks simultaneously to save time.
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="hover:shadow-lg transition-all duration-300 hover:translate-y-[-5px]">
-            <CardContent className="pt-6">
-              <h3 className="text-xl font-semibold mb-4">Direct Sharing</h3>
-              <p className="text-muted-foreground">
-                Share your exports directly to social media or cloud storage without downloading first.
-              </p>
-            </CardContent>
-          </Card>
+          
+          {/* Right side - Export Features */}
+          <div>
+            <h3 className="text-xl font-medium mb-6 flex items-center">
+              <Settings className="mr-2 h-5 w-5 text-soundboard-accent" />
+              Export Features
+            </h3>
+            
+            <Card className="shadow-md">
+              <CardContent className="pt-6">
+                <ul className="space-y-4">
+                  {[
+                    {
+                      title: "Export Individual Tracks",
+                      description: "Export each instrument or vocal track separately for further mixing.",
+                      icon: Music
+                    },
+                    {
+                      title: "Export Full Mix",
+                      description: "Generate a complete mixdown of all tracks combined.",
+                      icon: File
+                    },
+                    {
+                      title: "Quality Options",
+                      description: "Choose from various bit depths and sample rates for optimal quality.",
+                      icon: Settings
+                    },
+                    {
+                      title: "Fast Processing",
+                      description: "Our optimized export engine processes your audio quickly.",
+                      icon: Zap
+                    },
+                    {
+                      title: "Session Data Export",
+                      description: "Export project data to continue working in other sessions.",
+                      icon: FileJson
+                    },
+                    {
+                      title: "Direct Sharing",
+                      description: "Share your exports directly to social media or cloud storage.",
+                      icon: Share2
+                    },
+                    {
+                      title: "Shareable Links",
+                      description: "Generate links for others to download your exported audio.",
+                      icon: LinkIcon
+                    }
+                  ].map((feature, index) => (
+                    <motion.li
+                      key={index}
+                      className="flex items-start"
+                      variants={itemVariants}
+                      custom={index}
+                    >
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="bg-soundboard-accent/10 p-1.5 rounded-full">
+                          <feature.icon className="h-3.5 w-3.5 text-soundboard-accent" />
+                        </div>
+                      </div>
+                      <div className="ml-3">
+                        <p className="font-medium text-sm">{feature.title}</p>
+                        <p className="text-xs text-muted-foreground">{feature.description}</p>
+                      </div>
+                    </motion.li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </motion.div>
 
+      {/* Export Process Section */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.5 }}
-        className="text-center bg-gradient-to-r from-soundboard-primary/10 to-soundboard-accent/10 py-16 px-4 rounded-lg"
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="mb-16"
       >
-        <h2 className="text-3xl font-bold mb-6">Ready to Export Your Mix?</h2>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-          Join thousands of musicians already sharing their collaborative creations with the world.
-        </p>
+        <h2 className="text-2xl font-semibold text-center mb-8">The Export Process</h2>
+        
+        <div className="relative py-12">
+          {/* Process timeline */}
+          <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-muted hidden md:block" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[
+              {
+                step: 1,
+                title: "Finalize Your Mix",
+                description: "Make final adjustments to levels, effects, and track balance."
+              },
+              {
+                step: 2,
+                title: "Choose Export Settings",
+                description: "Select file format, quality, and which tracks to include."
+              },
+              {
+                step: 3,
+                title: "Process Audio",
+                description: "Our system renders your audio at the highest quality possible."
+              },
+              {
+                step: 4,
+                title: "Download & Share",
+                description: "Save to your device or share directly with collaborators."
+              }
+            ].map((phase, index) => (
+              <motion.div 
+                key={index}
+                className="flex flex-col items-center text-center"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2, duration: 0.4 }}
+              >
+                <div className="relative z-10 bg-background p-4 rounded-full border border-soundboard-accent mb-4 w-16 h-16 flex items-center justify-center">
+                  <span className="font-bold text-lg text-soundboard-accent">{phase.step}</span>
+                </div>
+                <h3 className="font-semibold mb-2">{phase.title}</h3>
+                <p className="text-sm text-muted-foreground">{phase.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Benefits Section */}
+      <motion.div 
+        className="mb-16 bg-muted py-12 px-6 rounded-lg"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className="text-2xl font-semibold text-center mb-8">Benefits of Our Export Technology</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[
+            "Preserves all audio quality from your recordings",
+            "Supports professional DAW integration",
+            "Includes metadata for better organization",
+            "Automatic backup of exported files",
+            "Resume interrupted exports",
+            "Batch export multiple projects"
+          ].map((benefit, index) => (
+            <motion.div
+              key={index}
+              className="flex items-center"
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1, duration: 0.3 }}
+            >
+              <Check className="h-5 w-5 text-soundboard-accent mr-3 flex-shrink-0" />
+              <span>{benefit}</span>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Call to Action */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="text-center"
+      >
         <Button
-          size="lg"
           className="bg-soundboard-accent hover:bg-soundboard-secondary text-white px-8 py-6 text-lg hover:scale-105 transition-transform"
           asChild
         >
-          <Link to="/auth?tab=signup">Sign Up Free</Link>
+          <Link to="/dashboard">
+            <Download className="mr-2 h-5 w-5" />
+            Try Exporting Now
+          </Link>
         </Button>
       </motion.div>
     </div>

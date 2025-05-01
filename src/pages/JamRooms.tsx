@@ -3,32 +3,44 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Headphones, Users, Music } from "lucide-react";
+import { Headphones, Users, Music, Mic, Speaker, Play } from "lucide-react";
+import useAnimatedVariants from "@/hooks/useAnimatedVariants";
 
 const JamRooms = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.3,
-        delayChildren: 0.2
-      }
+  const { containerVariants, itemVariants, scaleVariants } = useAnimatedVariants();
+
+  const features = [
+    {
+      title: "Create Private Sessions",
+      description: "Host invite-only jam sessions with your band members or collaborators for focused practice and recording.",
+      icon: Music
+    },
+    {
+      title: "Join Public Rooms",
+      description: "Discover and join public jam sessions with musicians from around the world to expand your network.",
+      icon: Users
+    },
+    {
+      title: "Real-time Audio",
+      description: "Experience low-latency audio streaming that makes remote collaboration feel like being in the same studio.",
+      icon: Headphones
+    },
+    {
+      title: "Multitrack Recording",
+      description: "Record individual tracks from each participant with separate volume controls and effects.",
+      icon: Mic
+    },
+    {
+      title: "High-Quality Sound",
+      description: "Enjoy pristine audio quality with our optimized streaming technology for musicians.",
+      icon: Speaker
+    },
+    {
+      title: "Live Session Playback",
+      description: "Instantly play back what you've just recorded to fine-tune your performance.",
+      icon: Play
     }
-  };
-  
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        type: "spring", 
-        stiffness: 100,
-        damping: 10
-      }
-    }
-  };
+  ];
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -52,53 +64,27 @@ const JamRooms = () => {
         animate="visible"
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
       >
-        <motion.div variants={itemVariants}>
-          <Card className="h-full hover:shadow-lg transition-shadow">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-center mb-6">
-                <div className="bg-soundboard-accent/10 p-4 rounded-full">
-                  <Music className="h-8 w-8 text-soundboard-accent" />
+        {features.map((feature, index) => (
+          <motion.div 
+            key={index} 
+            variants={itemVariants}
+            whileHover={scaleVariants.hover}
+          >
+            <Card className="h-full hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="bg-soundboard-accent/10 p-4 rounded-full">
+                    <feature.icon className="h-8 w-8 text-soundboard-accent" />
+                  </div>
                 </div>
-              </div>
-              <h3 className="text-xl font-semibold text-center mb-3">Create Private Sessions</h3>
-              <p className="text-muted-foreground text-center">
-                Host invite-only jam sessions with your band members or collaborators for focused practice and recording.
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div variants={itemVariants}>
-          <Card className="h-full hover:shadow-lg transition-shadow">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-center mb-6">
-                <div className="bg-soundboard-accent/10 p-4 rounded-full">
-                  <Users className="h-8 w-8 text-soundboard-accent" />
-                </div>
-              </div>
-              <h3 className="text-xl font-semibold text-center mb-3">Join Public Rooms</h3>
-              <p className="text-muted-foreground text-center">
-                Discover and join public jam sessions with musicians from around the world to expand your network.
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div variants={itemVariants}>
-          <Card className="h-full hover:shadow-lg transition-shadow">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-center mb-6">
-                <div className="bg-soundboard-accent/10 p-4 rounded-full">
-                  <Headphones className="h-8 w-8 text-soundboard-accent" />
-                </div>
-              </div>
-              <h3 className="text-xl font-semibold text-center mb-3">Real-time Audio</h3>
-              <p className="text-muted-foreground text-center">
-                Experience low-latency audio streaming that makes remote collaboration feel like being in the same studio.
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
+                <h3 className="text-xl font-semibold text-center mb-3">{feature.title}</h3>
+                <p className="text-muted-foreground text-center">
+                  {feature.description}
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
       </motion.div>
 
       <motion.div

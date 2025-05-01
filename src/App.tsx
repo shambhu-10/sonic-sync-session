@@ -44,7 +44,7 @@ const App = () => {
     <ThemeProvider>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<NavWrapper>{/* Outlet will be rendered here */}</NavWrapper>}>
+          <Route path="/" element={<NavWrapper />}>
             <Route index element={<Index />} />
             <Route path="auth" element={<Auth />} />
             <Route path="auth/callback" element={<AuthCallback />} />

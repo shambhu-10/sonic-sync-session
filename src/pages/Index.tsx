@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { MusicIcon, Headphones, Users, Download, Star, ArrowUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
-import ParticleNetworkAnimation from "@/components/ParticleNetworkAnimation";
+import InteractiveParticleBackground from "@/components/InteractiveParticleBackground";
 
 const Index = () => {
   const { user } = useAuth();
@@ -52,8 +52,8 @@ const Index = () => {
 
   return (
     <div className="relative min-h-[calc(100vh-64px)] flex flex-col">
-      {/* New particle network animation background */}
-      <ParticleNetworkAnimation />
+      {/* New interactive particle background animation */}
+      <InteractiveParticleBackground />
       
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center text-center flex-grow relative z-10">
@@ -258,7 +258,7 @@ const Index = () => {
         </div>
       </div>
       
-      {/* Testimonials Section */}
+      {/* Testimonials Section with Animation Enhancements */}
       <div className="bg-muted py-20">
         <div className="container mx-auto px-4">
           <motion.h2
@@ -299,6 +299,10 @@ const Index = () => {
                 key={index}
                 className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
                 variants={itemVariants}
+                whileHover={{ 
+                  y: -5,
+                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+                }}
               >
                 <div className="flex items-center mb-4">
                   <div className="flex-shrink-0">
@@ -323,7 +327,7 @@ const Index = () => {
         </div>
       </div>
       
-      {/* CTA Section */}
+      {/* CTA Section with Enhanced Animation */}
       <div className="py-20 bg-gradient-to-r from-soundboard-primary/20 to-soundboard-accent/20">
         <div className="container mx-auto px-4 text-center">
           <motion.div
@@ -333,16 +337,37 @@ const Index = () => {
             transition={{ duration: 0.5 }}
             className="max-w-2xl mx-auto"
           >
-            <h2 className="text-3xl font-bold mb-6">Ready to Make Music Together?</h2>
-            <p className="text-xl text-muted-foreground mb-10">
-              Join thousands of musicians creating, collaborating, and sharing their music with the world.
-            </p>
-            <Button
-              className="bg-soundboard-accent hover:bg-soundboard-secondary text-white text-lg px-10 py-6 hover:scale-105 transition-transform"
-              asChild
+            <motion.h2 
+              className="text-3xl font-bold mb-6"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <Link to="/auth?tab=signup">Start Creating Now</Link>
-            </Button>
+              Ready to Make Music Together?
+            </motion.h2>
+            <motion.p 
+              className="text-xl text-muted-foreground mb-10"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              Join thousands of musicians creating, collaborating, and sharing their music with the world.
+            </motion.p>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              <Button
+                className="bg-soundboard-accent hover:bg-soundboard-secondary text-white text-lg px-10 py-6 hover:scale-105 transition-transform"
+                asChild
+              >
+                <Link to="/auth?tab=signup">Start Creating Now</Link>
+              </Button>
+            </motion.div>
           </motion.div>
         </div>
       </div>
