@@ -16,8 +16,9 @@ const AuthCallback = () => {
         if (window.location.hash) {
           setMessage('Completing OAuth authentication...');
           
-          // Exchange the code for a session
-          const { data, error } = await supabase.auth.getSessionFromUrl();
+          // Process the OAuth callback
+          // Use exchangeCodeForSession for newer Supabase versions
+          const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.hash);
           
           if (error) {
             throw error;
