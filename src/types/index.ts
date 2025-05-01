@@ -57,6 +57,9 @@ export interface Mixdown {
   user_id: string;
   file_url: string;
   created_at: string;
+  // UI helpers for Profile page
+  roomTitle?: string;
+  username?: string;
 }
 
 export interface ChatMessage {

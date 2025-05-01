@@ -2,11 +2,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Session, User } from "@/types";
+import { User } from "@/types";
 import { toast } from "sonner";
+import { Session as SupabaseSession } from "@supabase/supabase-js";
 
+// Using our custom User type but Supabase's Session type structure
 interface AuthContextType {
-  session: Session | null;
+  session: SupabaseSession | null;
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
@@ -18,7 +20,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<SupabaseSession | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

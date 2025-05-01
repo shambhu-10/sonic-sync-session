@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Room, Loop, Participant, Mixdown, User, ChatMessage } from "@/types";
 
@@ -53,9 +52,21 @@ export const getRoom = async (roomId: string) => {
 };
 
 export const createRoom = async (roomData: Partial<Room>) => {
+  // Ensure required fields are present
+  if (!roomData.host_id || !roomData.title) {
+    throw new Error("Missing required fields for room creation");
+  }
+
   const { data, error } = await supabase
     .from("rooms")
-    .insert(roomData)
+    .insert({
+      title: roomData.title,
+      description: roomData.description,
+      bpm: roomData.bpm,
+      key_signature: roomData.key_signature,
+      host_id: roomData.host_id,
+      is_public: roomData.is_public
+    })
     .select()
     .single();
   
@@ -64,10 +75,14 @@ export const createRoom = async (roomData: Partial<Room>) => {
   }
   
   // Increment rooms_hosted count for the user
-  await supabase
-    .from("profiles")
-    .update({ rooms_hosted: supabase.rpc("increment", { inc: 1 }) })
-    .eq("id", roomData.host_id);
+  try {
+    await supabase
+      .from("profiles")
+      .update({ rooms_hosted: supabase.rpc("increment", { inc: 1 }) })
+      .eq("id", roomData.host_id);
+  } catch (err) {
+    console.error("Failed to update rooms_hosted count", err);
+  }
   
   return data as Room;
 };
@@ -94,6 +109,11 @@ export const getLoops = async (roomId: string) => {
 };
 
 export const createLoop = async (loopData: Partial<Loop>, audioFile: Blob) => {
+  // Ensure required fields are present
+  if (!loopData.room_id || !loopData.user_id || !loopData.name) {
+    throw new Error("Missing required fields for loop creation");
+  }
+  
   // Upload audio file to storage
   const fileExt = "webm";
   const filePath = `${loopData.user_id}/${loopData.room_id}/${new Date().getTime()}.${fileExt}`;
@@ -115,8 +135,13 @@ export const createLoop = async (loopData: Partial<Loop>, audioFile: Blob) => {
   const { data, error } = await supabase
     .from("loops")
     .insert({
-      ...loopData,
-      file_url: publicUrl
+      room_id: loopData.room_id,
+      user_id: loopData.user_id,
+      name: loopData.name,
+      file_url: publicUrl,
+      order_index: loopData.order_index || 0,
+      is_active: loopData.is_active !== undefined ? loopData.is_active : true,
+      volume: loopData.volume || 75
     })
     .select()
     .single();
@@ -126,10 +151,14 @@ export const createLoop = async (loopData: Partial<Loop>, audioFile: Blob) => {
   }
   
   // Increment loops_recorded count for the user
-  await supabase
-    .from("profiles")
-    .update({ loops_recorded: supabase.rpc("increment", { inc: 1 }) })
-    .eq("id", loopData.user_id);
+  try {
+    await supabase
+      .from("profiles")
+      .update({ loops_recorded: supabase.rpc("increment", { inc: 1 }) })
+      .eq("id", loopData.user_id);
+  } catch (err) {
+    console.error("Failed to update loops_recorded count", err);
+  }
   
   return data as Loop;
 };
@@ -212,6 +241,11 @@ export const leaveRoom = async (roomId: string, userId: string) => {
 
 // Mixdown Services
 export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Blob) => {
+  // Ensure required fields are present
+  if (!mixdownData.room_id || !mixdownData.user_id) {
+    throw new Error("Missing required fields for mixdown creation");
+  }
+  
   // Upload audio file to storage
   const fileExt = "webm";
   const filePath = `mixdowns/${mixdownData.user_id}/${mixdownData.room_id}/${new Date().getTime()}.${fileExt}`;
@@ -233,7 +267,8 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
   const { data, error } = await supabase
     .from("mixdowns")
     .insert({
-      ...mixdownData,
+      room_id: mixdownData.room_id,
+      user_id: mixdownData.user_id,
       file_url: publicUrl
     })
     .select()
@@ -244,10 +279,14 @@ export const createMixdown = async (mixdownData: Partial<Mixdown>, audioFile: Bl
   }
   
   // Increment mixdowns_exported count for the user
-  await supabase
-    .from("profiles")
-    .update({ mixdowns_exported: supabase.rpc("increment", { inc: 1 }) })
-    .eq("id", mixdownData.user_id);
+  try {
+    await supabase
+      .from("profiles")
+      .update({ mixdowns_exported: supabase.rpc("increment", { inc: 1 }) })
+      .eq("id", mixdownData.user_id);
+  } catch (err) {
+    console.error("Failed to update mixdowns_exported count", err);
+  }
   
   return data as Mixdown;
 };
@@ -298,9 +337,18 @@ export const updateProfile = async (userId: string, updates: Partial<User>) => {
 
 // Chat Services
 export const sendMessage = async (message: Partial<ChatMessage>) => {
+  // Ensure required fields are present
+  if (!message.room_id || !message.user_id || !message.content) {
+    throw new Error("Missing required fields for sending message");
+  }
+  
   const { data, error } = await supabase
     .from("chat_messages")
-    .insert(message)
+    .insert({
+      room_id: message.room_id,
+      user_id: message.user_id,
+      content: message.content
+    })
     .select()
     .single();
   

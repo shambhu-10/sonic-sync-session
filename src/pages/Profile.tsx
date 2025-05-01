@@ -1,5 +1,5 @@
-
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,13 +33,14 @@ import { Mixdown } from "@/types";
 import { Spinner } from "@/components/ui/spinner";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 const Profile = () => {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [mixdowns, setMixdowns] = useState<Mixdown[]>([]);
+  const [mixdowns, setMixdowns] = useState<(Mixdown & { roomTitle?: string, username?: string })[]>([]);
   const [isLoadingMixdowns, setIsLoadingMixdowns] = useState(false);
   
   useEffect(() => {
