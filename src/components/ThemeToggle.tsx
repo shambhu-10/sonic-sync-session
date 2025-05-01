@@ -13,6 +13,7 @@ export function ThemeToggle() {
       size="icon"
       onClick={toggleTheme}
       aria-label="Toggle theme"
+      className="relative overflow-hidden"
     >
       <motion.div
         initial={{ opacity: 0, rotate: -45 }}
@@ -20,6 +21,7 @@ export function ThemeToggle() {
         exit={{ opacity: 0, rotate: 45 }}
         transition={{ duration: 0.3 }}
         key={theme}
+        className="relative z-10"
       >
         {theme === "light" ? (
           <Moon className="h-5 w-5" />
@@ -27,6 +29,9 @@ export function ThemeToggle() {
           <Sun className="h-5 w-5" />
         )}
       </motion.div>
+      <span className="sr-only">
+        {theme === "light" ? "Switch to dark theme" : "Switch to light theme"}
+      </span>
     </Button>
   );
 }

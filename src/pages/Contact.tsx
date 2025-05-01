@@ -103,8 +103,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium">Email</h3>
-                    <p className="text-muted-foreground">support@soundboard.app</p>
-                    <p className="text-muted-foreground">info@soundboard.app</p>
+                    <p className="text-muted-foreground">shambhu04.kumar@gmail.com</p>
                   </div>
                 </div>
                 
@@ -114,8 +113,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium">Phone</h3>
-                    <p className="text-muted-foreground">+1 234 567 890</p>
-                    <p className="text-muted-foreground">+1 987 654 321</p>
+                    <p className="text-muted-foreground">9508543598</p>
                   </div>
                 </div>
                 
@@ -124,9 +122,8 @@ const Contact = () => {
                     <MapPin className="h-5 w-5 text-soundboard-accent" />
                   </div>
                   <div>
-                    <h3 className="font-medium">Office</h3>
-                    <p className="text-muted-foreground">123 Music Street</p>
-                    <p className="text-muted-foreground">Harmony City, HC 90210</p>
+                    <h3 className="font-medium">Address</h3>
+                    <p className="text-muted-foreground">HSR Layout, Bangalore, India</p>
                   </div>
                 </div>
                 

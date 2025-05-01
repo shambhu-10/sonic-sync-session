@@ -81,7 +81,7 @@ const Faqs = () => {
             <Accordion type="single" collapsible className="w-full">
               {faqsList.map((faq, index) => (
                 <motion.div key={index} variants={itemVariants}>
-                  <AccordionItem value={`item-${index}`}>
+                  <AccordionItem value={`item-${index}`} key={index}>
                     <AccordionTrigger className="text-lg font-medium hover:text-soundboard-accent transition-colors">
                       {faq.question}
                     </AccordionTrigger>

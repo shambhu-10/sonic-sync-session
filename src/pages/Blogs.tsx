@@ -36,6 +36,16 @@ const blogPosts = [
     readTime: "7 min read",
     category: "Industry",
     image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=800&auto=format&fit=crop"
+  },
+  {
+    id: "4",
+    title: "Building a Home Studio on a Budget",
+    excerpt: "You don't need expensive equipment to create professional-sounding music. This guide walks you through setting up an affordable home studio that delivers great results.",
+    author: "David Chen",
+    date: "April 5, 2025",
+    readTime: "10 min read",
+    category: "Equipment",
+    image: "https://images.unsplash.com/photo-1447160430190-9d1cae0b73db?q=80&w=800&auto=format&fit=crop"
   }
 ];
 
