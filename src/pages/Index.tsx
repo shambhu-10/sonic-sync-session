@@ -126,8 +126,14 @@ const Index = () => {
       </div>
       
       {/* Features Section - ENHANCED with better typography and visual design */}
-      <div className="bg-muted py-20" id="features">
-        <div className="container mx-auto px-4">
+      <div className="bg-gradient-to-br from-soundboard-accent/5 to-soundboard-primary/10 py-20 relative overflow-hidden" id="features">
+        {/* Add decorative background elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-soundboard-accent/10 rounded-full filter blur-[100px]"></div>
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-soundboard-primary/10 rounded-full filter blur-[80px]"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0 }}
@@ -171,7 +177,7 @@ const Index = () => {
           >
             {/* Feature 1 */}
             <motion.div 
-              className="bg-background p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group"
+              className="bg-background/80 backdrop-blur-sm p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group border border-white/10"
               variants={itemVariants}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-soundboard-primary/5 to-soundboard-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -186,7 +192,7 @@ const Index = () => {
             
             {/* Feature 2 */}
             <motion.div 
-              className="bg-background p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group"
+              className="bg-background/80 backdrop-blur-sm p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group border border-white/10"
               variants={itemVariants}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-soundboard-primary/5 to-soundboard-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -201,7 +207,7 @@ const Index = () => {
             
             {/* Feature 3 */}
             <motion.div 
-              className="bg-background p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group"
+              className="bg-background/80 backdrop-blur-sm p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group border border-white/10"
               variants={itemVariants}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-soundboard-primary/5 to-soundboard-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -295,8 +301,17 @@ const Index = () => {
       </div>
       
       {/* Testimonials Section with ENHANCED Animation and Visual Design */}
-      <div className="bg-muted py-20">
-        <div className="container mx-auto px-4">
+      <div className="bg-gradient-to-tl from-soundboard-primary/10 to-soundboard-accent/5 py-20 relative overflow-hidden">
+        {/* Add decorative elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-1/3 right-0 w-80 h-80 bg-soundboard-accent/10 rounded-full filter blur-[80px]"></div>
+          <div className="absolute bottom-0 left-1/4 w-96 h-72 bg-soundboard-primary/10 rounded-full filter blur-[100px]"></div>
+          <div className="absolute top-1/4 left-1/3 w-4 h-4 bg-soundboard-accent/30 rounded-full"></div>
+          <div className="absolute top-2/3 right-1/4 w-6 h-6 bg-soundboard-primary/20 rounded-full"></div>
+          <div className="absolute top-1/2 left-3/4 w-3 h-3 bg-soundboard-accent/20 rounded-full"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0 }}
@@ -360,7 +375,7 @@ const Index = () => {
             ].map((testimonial, index) => (
               <motion.div
                 key={index}
-                className="bg-background p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border border-transparent hover:border-soundboard-accent/20 relative overflow-hidden"
+                className="bg-background/80 backdrop-blur-sm p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] border border-white/10 relative overflow-hidden"
                 variants={itemVariants}
                 whileHover={{ 
                   y: -5,
