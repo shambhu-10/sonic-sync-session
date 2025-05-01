@@ -198,7 +198,7 @@ const Footer = () => {
                   <li className="flex items-center text-sm text-muted-foreground hover:text-soundboard-accent transition-colors">
                     <Phone className="h-4 w-4 mr-2" />
                     <Link to="/contact" className="story-link">
-                      +1 234 567 890
+                      +91 9508543598
                     </Link>
                   </li>
                 </ul>
@@ -330,7 +330,7 @@ const Footer = () => {
                   <li className="flex items-center text-sm">
                     <Phone className="h-4 w-4 mr-2" />
                     <Link to="/contact" className="text-muted-foreground hover:text-soundboard-accent transition-colors">
-                      +1 234 567 890
+                      +91 9508543598
                     </Link>
                   </li>
                 </ul>
