@@ -4,12 +4,16 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Outlet } from "react-router-dom";
 import MainNav from "./MainNav";
 import Footer from "./Footer";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 interface NavWrapperProps {
   children?: ReactNode;
 }
 
 const NavWrapper = ({ children }: NavWrapperProps) => {
+  // Call useScrollToTop here where it's inside the Router context
+  useScrollToTop();
+  
   // This function finds and enhances the nav element by adding the theme toggle
   const enhanceNav = () => {
     // Add theme toggle to header nav
