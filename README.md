@@ -85,20 +85,6 @@ The project uses Vite for building. Key configurations can be found in:
 - `tsconfig.json`
 - `tailwind.config.ts`
 
-## 🎨 UI Components
-
-The application uses a custom component library built with:
-- shadcn/ui for base components
-- Tailwind CSS for styling
-- Framer Motion for animations
-
-## 🔒 Security
-
-- All audio streams are encrypted
-- User authentication is handled through Supabase
-- Secure WebRTC connections
-- Protected API endpoints
-
 ## 🌐 Deployment
 
 The application is configured for deployment on Vercel:
@@ -130,21 +116,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Thanks to all contributors who have helped shape this project
 - Special thanks to the open-source community for the amazing tools and libraries
-
-## 📞 Support
-
-For support, please:
-- Open an issue in the GitHub repository
-- Contact us at support@soundboard.app
-- Visit our [documentation](https://docs.soundboard.app)
-
-## 🔄 Updates
-
-Stay tuned for upcoming features:
-- Mobile app version
-- Advanced audio effects
-- Collaborative playlist creation
-- Social features and community building
 
 ---
 
