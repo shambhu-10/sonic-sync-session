@@ -111,16 +111,26 @@
   /* Special styles for specific inputs */
   .recording-name-input {
     @apply text-foreground font-medium;
+    background-color: transparent;
   }
   
   .dark .recording-name-input {
-    @apply text-gray-100;
+    @apply text-white;
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.05);
   }
   
   /* Fix specifically for jam room recording name input */
   .dark input#recordingName {
-    @apply text-gray-100;
-    color: #eee !important; /* Force higher contrast in dark mode */
+    @apply text-white;
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Fix placeholder color in dark mode */
+  .dark input#recordingName::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
   }
 }
 
